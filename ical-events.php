@@ -1,14 +1,14 @@
 <?php
 /*
 Plugin Name: iCal Events
-Version: $Revision: 1.8 $
+Version: 0.9
 Plugin URI: http://www.webadmin.ufl.edu/
 Description: Display events from an iCal source. Requires <a href="http://cvs.sourceforge.net/viewcvs.py/webcalendar/webcalendar/import_ical.php?rev=HEAD">import_ical.php</a> from the <a href="http://sourceforge.net/projects/webcalendar/">WebCalendar</a> project.
 Author: Daniel Westermann-Clark
-Author URI: http://www.webadmin.ufl.edu/
+Author URI: http://dev.webadmin.ufl.edu/~dwc/
 */
 
-require('lib/import_ical.php');
+require('import_ical.php');
 
 
 if (! class_exists('ICalEvents')) {

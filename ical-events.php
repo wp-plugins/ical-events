@@ -2,7 +2,7 @@
 /*
 Plugin Name: iCal Events
 Version: 0.9
-Plugin URI: http://www.webadmin.ufl.edu/
+Plugin URI: http://dev.webadmin.ufl.edu/~dwc/2005/03/10/ical-events-plugin/
 Description: Display events from an iCal source. Requires <a href="http://cvs.sourceforge.net/viewcvs.py/webcalendar/webcalendar/import_ical.php?rev=HEAD">import_ical.php</a> from the <a href="http://sourceforge.net/projects/webcalendar/">WebCalendar</a> project.
 Author: Daniel Westermann-Clark
 Author URI: http://dev.webadmin.ufl.edu/~dwc/

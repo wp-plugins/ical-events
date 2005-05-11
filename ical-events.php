@@ -46,8 +46,8 @@ if (! class_exists('ICalEvents')) {
 			$output = '';
 			foreach ($events as $event) {
 				$output .= $before;
-				$output .= ICalEvents::format_date_range($event['StartTime'], $event['EndTime'], $date_format, $time_format);
-				$output .= ICalEvents::format_event_description($event['Summary'], $event['Description']);
+				$output .= htmlentities(ICalEvents::format_date_range($event['StartTime'], $event['EndTime'], $date_format, $time_format));
+				$output .= htmlentities(ICalEvents::format_event_description($event['Summary'], $event['Description']));
 				$output .= "<!-- " . htmlentities($event['UID']) . " -->";
 				$output .= $after . "\n";
 			}

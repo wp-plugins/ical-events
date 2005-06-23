@@ -14,6 +14,8 @@ This plugin uses <a href="http://cvs.sourceforge.net/viewcvs.py/webcalendar/webc
 
 `<?php ICalEvents::display_events('http://www.ufl.edu/calendar/ufCalendar.ics', time(), NULL, 3); ?>`
 
+This example displays three events from the University of Florida calendar, from the current time forward. For more information, see below.
+
 == Frequently Asked Questions ==
 
 = How can I control the output of this plugin? =
@@ -27,6 +29,10 @@ The `display_events` function takes the following arguments:
 * Time format (optional): The format string used to format times. Default: `%I:%M %p`.
 * Before (optional): HTML or text to display before each event. Default: `<li>`.
 * After (optional): HTML or text to display after each event. Default: `</li>`.
+* Before date (optional): HTML or text to display before each event's date. Default: `<strong>`.
+* After date (optional): HTML or text to display after each event's date. Default: `</strong>`.
+* Before description (optional): HTML or text to display before each event's description. Default: Empty string.
+* After description (optional): HTML or text to display after each event's description. Default: Empty string.
 * Echo (optional): Whether or not to directly display the events. Default: `true`.
 
 = How often is the calendar checked for new events? =

@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: iCal Events
-Version: 1.0
+Version: 1.1
 Plugin URI: http://dev.webadmin.ufl.edu/~dwc/2005/03/10/ical-events-plugin/
 Description: Display events from an iCal source. Requires <a href="http://cvs.sourceforge.net/viewcvs.py/webcalendar/webcalendar/import_ical.php?rev=HEAD">import_ical.php</a> from the <a href="http://sourceforge.net/projects/webcalendar/">WebCalendar</a> project.
 Author: Daniel Westermann-Clark
@@ -38,7 +38,7 @@ if (! class_exists('ICalEvents')) {
 		 * Display up to the specified number of events that fall within the specified
 		 * range on the specified calendar.  All constraints are optional.
 		 */
-		function display_events($url, $gmt_start = NULL, $gmt_end = NULL, $number_of_events = NULL, $date_format = '%a %b %d', $time_format = '%I:%M %p', $before = '<li>', $after = '</li>', $echo = true) {
+		function display_events($url, $gmt_start = NULL, $gmt_end = NULL, $number_of_events = NULL, $date_format = '%a %b %d', $time_format = '%I:%M %p', $before = '<li>', $after = '</li>', $before_date = '<strong>', $after_date = '</strong>', $before_description = '', $after_description = '', $echo = true) {
 			$filename = ICalEvents::cache_url($url);
 			$ical = parse_ical($filename);
 			$events = ICalEvents::constrain($ical, $gmt_start, $gmt_end, $number_of_events);
@@ -46,8 +46,12 @@ if (! class_exists('ICalEvents')) {
 			$output = '';
 			foreach ($events as $event) {
 				$output .= $before;
+				$output .= $before_date;
 				$output .= htmlentities(ICalEvents::format_date_range($event['StartTime'], $event['EndTime'], $date_format, $time_format));
+				$output .= $after_date;
+				$output .= $before_description;
 				$output .= htmlentities(ICalEvents::format_event_description($event['Summary'], $event['Description']));
+				$output .= $after_description;
 				$output .= "<!-- " . htmlentities($event['UID']) . " -->";
 				$output .= $after . "\n";
 			}

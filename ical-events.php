@@ -38,7 +38,7 @@ if (! class_exists('ICalEvents')) {
 		 * Display up to the specified number of events that fall within the specified
 		 * range on the specified calendar.  All constraints are optional.
 		 */
-		function display_events($url, $gmt_start = NULL, $gmt_end = NULL, $number_of_events = NULL, $date_format = '%a %b %d', $time_format = '%I:%M %p', $before = '<li>', $after = '</li>', $before_date = '<strong>', $after_date = '</strong>', $before_description = '', $after_description = '', $echo = true) {
+		function display_events($url, $gmt_start = NULL, $gmt_end = NULL, $number_of_events = NULL, $date_format = '%a %b %d', $time_format = '%l:%M %p', $before = '<li>', $after = '</li>', $before_date = '<strong>', $after_date = '</strong>', $before_description = '', $after_description = '', $echo = true) {
 			$filename = ICalEvents::cache_url($url);
 			$ical = parse_ical($filename);
 			$events = ICalEvents::constrain($ical, $gmt_start, $gmt_end, $number_of_events);

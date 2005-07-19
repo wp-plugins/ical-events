@@ -123,45 +123,44 @@ if (! class_exists('ICalEvents')) {
 		function format_date_range($gmt_start, $gmt_end, $date_format, $time_format, $separator = ' - ') {
 			$output = '';
 
-			$output .= ICalEvents::format_date($gmt_start, $date_format, $time_format);
-			if ($gmt_start != $gmt_end) {
-				$output .= $separator . ICalEvents::format_date($gmt_end, $date_format, $time_format);
-			}
-
-			return $output;
-		}
-
-		/*
-		 * Return a string representing the specified date.
-		 */
-		function format_date($gmt_time, $date_format, $time_format) {
-			$output = '';
-
-			$local_time = localtime($gmt_time, 1);
-			if (ICalEvents::time_is_today($gmt_time)) {
-				$output = strftime("$time_format", $gmt_time);
-			}
-			else if ($local_time['tm_hour'] != 0) {
-				$output = strftime("$date_format $time_format", $gmt_time);
+			if (ICalEvents::is_today($gmt_start)) {
+				$output .= strftime($time_format, $gmt_start);
 			}
 			else {
-				$output = strftime("$date_format", $gmt_time);
+				$output .= strftime("$date_format $time_format", $gmt_start);
+			}
+
+			if ($gmt_start != $gmt_end) {
+				$output .= $separator;
+				if (ICalEvents::is_today($gmt_end) or ICalEvents::same_day($gmt_start, $gmt_end)) {
+					$output .= strftime($time_format, $gmt_end);
+				}
+				else {
+					$output .= strftime("$date_format $time_format", $gmt_end);
+				}
 			}
 
 			return $output;
 		}
 
 		/*
-		 * Given a time value (as seconds since the epoch), return true iff the time
-		 * falls on the current day.
+		 * Given a time value (as seconds since the epoch), return true
+		 * iff the time falls on the current day.
 		 */
-		function time_is_today($gmt_time) {
-			$current_time = localtime(time(), 1);
-			$local_time = localtime($gmt_time, 1);
+		function is_today($gmt_time) {
+			return ICalEvents::same_day(time(), $gmt_time);
+		}
 
-			return ($current_time['tm_mday'] == $local_time['tm_mday']
-				and $current_time['tm_mon'] == $local_time['tm_mon']
-				and $current_time['tm_year'] == $local_time['tm_year']);
+		/*
+		 * Return true iff the two specified times fall on the same day.
+		 */
+		function same_day($gmt_time1, $gmt_time2) {
+			$local_time1 = localtime($gmt_time1, 1);
+			$local_time2 = localtime($gmt_time2, 1);
+
+			return ($local_time1['tm_mday'] == $local_time2['tm_mday']
+				and $local_time1['tm_mon'] == $local_time2['tm_mon']
+				and $local_time1['tm_year'] == $local_time2['tm_year']);
 		}
 
 		/*

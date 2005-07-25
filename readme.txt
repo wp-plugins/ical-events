@@ -26,7 +26,7 @@ The `display_events` function takes the following arguments:
 * End time (optional): Only events before this time are displayed.
 * Number of events (optional): The maximum number of events to display.
 * Date format (optional): The format string used to format dates (see <a href="http://php.net/strftime">strftime documentation</a>). Default: `%a %b %d`.
-* Time format (optional): The format string used to format times. Default: `%I:%M %p`.
+* Time format (optional): The format string used to format times. Default: `%l:%M %p`.
 * Before (optional): HTML or text to display before each event. Default: `<li>`.
 * After (optional): HTML or text to display after each event. Default: `</li>`.
 * Before date (optional): HTML or text to display before each event's date. Default: `<strong>`.

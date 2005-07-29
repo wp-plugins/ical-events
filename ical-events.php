@@ -35,10 +35,11 @@ if (! class_exists('ICalEvents')) {
 		}
 
 		/*
-		 * Display up to the specified number of events that fall within the specified
-		 * range on the specified calendar.  All constraints are optional.
+		 * Display up to the specified number of events that fall within
+		 * the specified range on the specified calendar.  All
+		 * constraints are optional.
 		 */
-		function display_events($url, $gmt_start = null, $gmt_end = null, $number_of_events = null, $date_format = '%a %b %d', $time_format = '%l:%M %p', $before = '<li>', $after = '</li>', $before_date = '<strong>', $after_date = '</strong>', $before_description = '', $after_description = '', $echo = true) {
+		function display_events($url, $gmt_start = null, $gmt_end = null, $number_of_events = null, $date_format = '%a %b %e', $time_format = '%l:%M %p', $before = '<li>', $after = '</li>', $before_date = '<strong>', $after_date = '</strong>', $before_description = '', $after_description = '', $echo = true) {
 			$filename = ICalEvents::cache_url($url);
 			$ical = parse_ical($filename);
 			$events = ICalEvents::constrain($ical, $gmt_start, $gmt_end, $number_of_events);
@@ -69,7 +70,8 @@ if (! class_exists('ICalEvents')) {
 		}
 
 		/*
-		 * Cache the specified URL and return the name of the destination file.
+		 * Cache the specified URL and return the name of the
+		 * destination file.
 		 */
 		function cache_url($url) {
 			$filename = ICalEvents::get_cache_path() . basename($url);
@@ -112,7 +114,8 @@ if (! class_exists('ICalEvents')) {
 
 		/*
 		 * Sort the specified associative array by the specified key.
-		 * Originally from http://us2.php.net/manual/en/function.usort.php.
+		 * Originally from
+		 * http://us2.php.net/manual/en/function.usort.php.
 		 */
 		function sort_by_key($data, $key) {
 			// Reverse sort
@@ -188,8 +191,8 @@ if (! class_exists('ICalEvents')) {
 		}
 
 		/*
-		 * Return a string describing an event with the specified summary and
-		 * description.
+		 * Return a string describing an event with the specified
+		 * summary and description.
 		 */
 		function format_event_description($summary, $description, $ignore_tokens = ', . "') {
 			$output = '';

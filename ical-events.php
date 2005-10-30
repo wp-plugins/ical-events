@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: iCal Events
-Version: 1.3
+Version: 1.4
 Plugin URI: http://dev.webadmin.ufl.edu/~dwc/2005/03/10/ical-events-plugin/
 Description: Display events from an iCal source. Requires <a href="http://cvs.sourceforge.net/viewcvs.py/webcalendar/webcalendar/import_ical.php?rev=HEAD">import_ical.php</a> from the <a href="http://sourceforge.net/projects/webcalendar/">WebCalendar</a> project.
 Author: Daniel Westermann-Clark
@@ -13,27 +13,6 @@ require('import_ical.php');
 
 if (! class_exists('ICalEvents')) {
 	class ICalEvents {
-		/*
-		 * Attempt to create the cache directory if it doesn't exist.
-		 * Return the path if successful.
-		 */
-		function get_cache_path() {
-			$cache_path = trailingslashit(ABSPATH . 'wp-content/ical-events-cache');
-
-			if (! file_exists($cache_path)) {
-				if (is_writable(dirname($cache_path))) {
-					if (! mkdir($cache_path, 0777)) {
-						die("Error creating cache directory ($cache_path)");
-					}
-				}
-				else {
-					die("Your cache directory (<code>$cache_path</code>) needs to be writable for this plugin to work. Double-check it. <a href='" . get_settings('siteurl') . "/wp-admin/plugins.php?action=deactivate&amp;plugin=ical-events.php'>Deactivate the iCal Events plugin</a>.");
-				}
-			}
-
-			return $cache_path;
-		}
-
 		/*
 		 * Display up to the specified number of events that fall within
 		 * the specified range on the specified calendar.  All
@@ -70,13 +49,34 @@ if (! class_exists('ICalEvents')) {
 		}
 
 		/*
+		 * Attempt to create the cache directory if it doesn't exist.
+		 * Return the path if successful.
+		 */
+		function get_cache_path() {
+			$cache_path = trailingslashit(ABSPATH . 'wp-content/ical-events-cache');
+
+			if (! file_exists($cache_path)) {
+				if (is_writable(dirname($cache_path))) {
+					if (! mkdir($cache_path, 0777)) {
+						die("Error creating cache directory ($cache_path)");
+					}
+				}
+				else {
+					die("Your cache directory (<code>$cache_path</code>) needs to be writable for this plugin to work. Double-check it. <a href='" . get_settings('siteurl') . "/wp-admin/plugins.php?action=deactivate&amp;plugin=ical-events.php'>Deactivate the iCal Events plugin</a>.");
+				}
+			}
+
+			return $cache_path;
+		}
+
+		/*
 		 * Cache the specified URL and return the name of the
 		 * destination file.
 		 */
 		function cache_url($url) {
 			$filename = ICalEvents::get_cache_path() . basename($url);
 
-			if ((! file_exists($filename)) or (time() - filemtime($filename) >= 24 * 60 * 60)) {
+			if (! file_exists($filename) or time() - filemtime($filename) >= 24 * 60 * 60) {
 				$src  = fopen($url, 'r') or die("Error opening $url");
 				$dest = fopen($filename, 'w') or die("Error opening $filename");
 
@@ -102,10 +102,10 @@ if (! class_exists('ICalEvents')) {
 			$ical = ICalEvents::sort_by_key($ical, 'StartTime');
 			$count = 0;
 			foreach ($ical as $event) {
-				if (((! $gmt_start) or ($event['StartTime'] >= $gmt_start))
-				    and ((! $gmt_end) or ($event['EndTime'] <= $gmt_end))
-				    and (++$count <= $number_of_events)) {
-					array_push($events, $event);
+				if ((! $gmt_start or $event['StartTime'] >= $gmt_start)
+				    and (! $gmt_end or $event['EndTime'] <= $gmt_end)
+				    and ++$count <= $number_of_events) {
+					$events[] = $event;
 				}
 			}
 
@@ -119,7 +119,7 @@ if (! class_exists('ICalEvents')) {
 		 */
 		function sort_by_key($data, $key) {
 			// Reverse sort
-			$compare = create_function('$a, $b', 'if ($a["'.$key.'"] == $b["'.$key.'"]) { return 0; } else { return ($a["'.$key.'"] < $b["'.$key.'"]) ? -1 : 1; }');
+			$compare = create_function('$a, $b', 'if ($a["' . $key . '"] == $b["' . $key . '"]) { return 0; } else { return ($a["' . $key . '"] < $b["' . $key . '"]) ? -1 : 1; }');
 			usort($data, $compare);
 
 			return $data;
@@ -164,17 +164,12 @@ if (! class_exists('ICalEvents')) {
 		 * midnight one day to midnight the next.
 		 */
 		function is_all_day($gmt1, $gmt2) {
-			if (abs($gmt2 - $gmt1) != 24 * 60 * 60) {
-				return false;
-			}
-
 			$local1 = localtime(($gmt1 <= $gmt2 ? $gmt1 : $gmt2), 1);
 			$local2 = localtime(($gmt1 <= $gmt2 ? $gmt2 : $gmt1), 1);
 
-			return ($local1['tm_hour'] == $local2['tm_hour']
+			return (abs($gmt2 - $gmt1) == 24 * 60 * 60
+				and $local1['tm_hour'] == $local2['tm_hour']
 				and $local1['tm_hour'] == 0
-				and $local1['tm_mday'] == $local2['tm_mday'] - 1
-				and $local1['tm_mon'] == $local2['tm_mon']
 				and $local1['tm_year'] == $local2['tm_year']);
 		}
 

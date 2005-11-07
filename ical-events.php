@@ -10,6 +10,14 @@ Author URI: http://dev.webadmin.ufl.edu/~dwc/
 
 require('import_ical.php');
 
+/*
+ * As defined by import_ical.php, though not exported...
+ */
+$ICAL_EVENTS_REPEAT_INTERVALS = array(
+	1 => 24 * 60 * 60,        // Daily
+	2 => 7 * 24 * 60 * 60,    // Weekly
+	5 => 365 * 25 * 60 * 60,  // Yearly
+);
 
 if (! class_exists('ICalEvents')) {
 	class ICalEvents {
@@ -20,8 +28,8 @@ if (! class_exists('ICalEvents')) {
 		 */
 		function display_events($url, $gmt_start = null, $gmt_end = null, $number_of_events = null, $date_format = '%a %b %e', $time_format = '%l:%M %p', $before = '<li>', $after = '</li>', $before_date = '<strong>', $after_date = '</strong>', $before_description = '', $after_description = '', $echo = true) {
 			$filename = ICalEvents::cache_url($url);
-			$ical = parse_ical($filename);
-			$events = ICalEvents::constrain($ical, $gmt_start, $gmt_end, $number_of_events);
+			$events = parse_ical($filename);
+			$events = ICalEvents::constrain($events, $gmt_start, $gmt_end, $number_of_events);
 
 			$output = '';
 			foreach ($events as $event) {
@@ -96,20 +104,29 @@ if (! class_exists('ICalEvents')) {
 		 * specified start and end time, up to the specified number of
 		 * events.
 		 */
-		function constrain($ical, $gmt_start = null, $gmt_end = null, $number_of_events = null) {
-			$events = array();
+		function constrain($events, $gmt_start = null, $gmt_end = null, $number_of_events = null) {
+			$events = ICalEvents::sort_by_key($events, 'StartTime');
 
-			$ical = ICalEvents::sort_by_key($ical, 'StartTime');
+			$constrained = array();
 			$count = 0;
-			foreach ($ical as $event) {
-				if ((! $gmt_start or $event['StartTime'] >= $gmt_start)
-				    and (! $gmt_end or $event['EndTime'] <= $gmt_end)
-				    and ++$count <= $number_of_events) {
-					$events[] = $event;
+			foreach ($events as $event) {
+				if (ICalEvents::falls_between($event, $gmt_start, $gmt_end)) {
+					$constrained[] = $event;
+				}
+				else if (isset($event['Repeat'])) {
+					$repeats = ICalEvents::get_repeats_between($event, $gmt_start, $gmt_end);
+					foreach ($repeats as $repeat) {
+						$constrained[] = $repeat;
+					}
 				}
 			}
 
-			return $events;
+			// TODO: This really should be done in the loop
+			if ($number_of_events) {
+				$constrained = array_splice($constrained, 0, $number_of_events);
+			}
+
+			return $constrained;
 		}
 
 		/*
@@ -123,6 +140,69 @@ if (! class_exists('ICalEvents')) {
 			usort($data, $compare);
 
 			return $data;
+		}
+
+		/*
+		 * Return true iff the specified event falls between the given
+		 * start and end times.
+		 */
+		function falls_between($event, $gmt_start, $gmt_end) {
+			return ((! $gmt_start or $event['StartTime'] >= $gmt_start)
+				and (! $gmt_end or $event['EndTime'] <= $gmt_end));
+		}
+
+		/*
+		 * If the specified event repeats between the given start and
+		 * end times, return one or more nonrepeating events at the
+		 * corresponding times.
+		 */
+		function get_repeats_between($event, $gmt_start, $gmt_end) {
+			global $ICAL_EVENTS_REPEAT_INTERVALS;
+
+			/*
+			echo "get_repeat_between: event = [\n";
+			print_r($event);
+			echo "], gmt_start = [$gmt_start], gmt_end = [$gmt_end]\n";
+			*/
+
+			$rr = $event['Repeat'];
+			if ($gmt_end and $gmt_end >= $rr['EndTime']) return;
+
+			$duration = 0;
+			if (isset($event['EndTime'])) {
+				$duration = $event['EndTime'] - $event['StartTime'];
+			}
+
+			$repeats = array();
+			if (isset($ICAL_EVENTS_REPEAT_INTERVALS[$rr['Interval']])) {
+				$interval    = $ICAL_EVENTS_REPEAT_INTERVALS[$rr['Interval']] * $rr['Frequency'];
+				$repeat_days = preg_split('//', $rr['RepeatDays'], -1, PREG_SPLIT_NO_EMPTY);
+
+				$current_time = $event['StartTime'];
+				while ($current_time <= $rr['EndTime']) {
+					$repeat = $event;
+					unset($repeat['Repeat']);
+
+					$repeat['StartTime'] = $current_time;
+					if ($duration > 0) {
+						$repeat['EndTime'] = $current_time + $duration;
+					}
+
+					if (ICalEvents::falls_between($repeat, $gmt_start, $gmt_end)) {
+						$repeats[] = $repeat;
+					}
+
+					// TODO: Handle repeat days
+					// TODO: Handle exceptions
+
+					$current_time += $interval;
+				}
+			}
+			else {
+				echo "Unknown repeat interval: ${rr['Interval']}";
+			}
+
+			return $repeats;
 		}
 
 		/*

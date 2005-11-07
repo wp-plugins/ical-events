@@ -324,7 +324,7 @@ function format_ical($event) {
           echo "Unsupported iCal BYMONTH value \"$match[1]\"<br />\n";
         }
       } else if ( preg_match ( "/^BYDAY=(.+)$/i", $RR[$i], $match ) ) {
-        $fevent['Repeat']['RepeatDays'] = rrule_repeat_days( $match[1] );
+        $fevent['Repeat']['RepeatDays'] = rrule_repeat_days( explode(',', $match[1]) );
       } else if ( preg_match ( "/^BYMONTHDAY=(.+)$/i", $RR[$i], $match ) ) {
         // NOT YET SUPPORTED -- TODO
         echo "Unsupported iCal BYMONTHDAY value \"$RR[$i]\"<br />\n";
@@ -350,9 +350,8 @@ function format_ical($event) {
 // Figure out days of week for weekly repeats
 function rrule_repeat_days($RA) {
   $T = count($RA);
-  $j = $T - 1;
   $sun = $mon = $tue = $wed = $thu = $fri = $sat = 'n';
-  for ($i = 1; $i < $j; $i++) {
+  for ($i = 0; $i < $T; $i++) {
     if ($RA[$i] == 'SU') {
       $sun = 'y';
     } elseif ($RA[$i] == 'MO') {

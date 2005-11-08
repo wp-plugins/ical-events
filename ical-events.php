@@ -26,7 +26,7 @@ if (! class_exists('ICalEvents')) {
 		 * the specified range on the specified calendar.  All
 		 * constraints are optional.
 		 */
-		function display_events($url, $gmt_start = null, $gmt_end = null, $number_of_events = null, $date_format = '%a %b %e', $time_format = '%l:%M %p', $before = '<li>', $after = '</li>', $before_date = '<strong>', $after_date = '</strong>', $before_description = '', $after_description = '', $echo = true) {
+		function display_events($url, $gmt_start = null, $gmt_end = null, $number_of_events = null, $date_format = '%a %b %e', $time_format = '%l:%M %p', $before = '<li>', $after = '</li>', $before_date = '<strong>', $after_date = '</strong>', $before_description = '', $after_description = '', $before_location = ' (', $after_location = ')', $echo = true) {
 			$events = ICalEvents::get_events($url, $gmt_start, $gmt_end, $number_of_events);
 
 			$output = '';
@@ -40,9 +40,12 @@ if (! class_exists('ICalEvents')) {
 					$output .= htmlentities(ICalEvents::format_date_range($event['StartTime'], $event['EndTime'], $date_format, $time_format));
 				}
 				$output .= $after_date;
-				$output .= $before_description;
-				$output .= htmlentities(ICalEvents::format_event_description($event['Summary'], $event['Description']));
-				$output .= $after_description;
+				$output .= $before_description
+					. htmlentities(ICalEvents::format_event_description($event['Summary'], $event['Description']))
+					. $after_description;
+				if (isset($event['Location'])) {
+					$output .= $before_location . htmlentities($event['Location']) . $after_location;
+				}
 				$output .= "<!-- " . htmlentities($event['UID']) . " -->";
 				$output .= $after . "\n";
 			}

@@ -87,6 +87,9 @@ function parse_ical ( $cal_file ) {
           } elseif (preg_match("/^DESCRIPTION.*:(.+)$/i", $buff, $match)) {
               $substate = "description";
               $event[$substate] = $match[1];
+          } elseif (preg_match("/^LOCATION.*:(.+)$/i", $buff, $match)) {
+              $substate = "location";
+              $event[$substate] = $match[1];
           } elseif (preg_match("/^CLASS.*:(.*)$/i", $buff, $match)) {
               $substate = "class";
               $event[$substate] = $match[1];
@@ -250,6 +253,7 @@ function format_ical($event) {
 
   $fevent['Summary'] = $event['summary'];
   $fevent['Description'] = $event['description'];
+  $fevent['Location'] = $event['location'];
   $fevent['Private'] = preg_match("/private|confidential/i", $event['class']) ? '1' : '0';
   $fevent['UID'] = $event['uid'];
 

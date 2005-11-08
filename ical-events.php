@@ -248,10 +248,10 @@ if (! class_exists('ICalEvents')) {
 		 */
 		function get_simple_repeat($event, $interval, $count) {
 			$duration = 0;
-			if (isset($event['Duration'])) {
+			if ($event['Duration']) {
 				$duration = $event['Duration'] * 60;
 			}
-			else if (isset($event['EndTime'])) {
+			else if ($event['EndTime']) {
 				$duration = $event['EndTime'] - $event['StartTime'];
 			}
 

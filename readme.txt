@@ -12,7 +12,7 @@ This plugin uses <a href="http://cvs.sourceforge.net/viewcvs.py/webcalendar/webc
 2. Activate the plugin on the Plugins screen.
 3. Place the following in your template:
 
-`<?php ICalEvents::display_events('url=http://www.ufl.edu/calendar/ufCalendar.ics&number_of_events=3&gmt_start=' . time()); ?>`
+`<?php ICalEvents::display_events('url=http://www.ufl.edu/calendar/ufCalendar.ics&limit=3&gmt_start=' . time()); ?>`
 
 This example displays three events from the University of Florida calendar, from the current time forward. For more information, see below.
 
@@ -24,7 +24,7 @@ The `display_events` function takes the following arguments:
 * `url`: The URL of the iCal file.
 * `gmt_start` (optional): Only events from this time forward are displayed. If not specified, the earliest events are displayed.
 * `gmt_end` (optional): Only events before this time are displayed.
-* `number_of_events` (optional): The maximum number of events to display.
+* `limit` (optional): The maximum number of events to display.
 * `date_format` (optional): The format string used to format dates` (see <a href="http://php.net/strftime">strftime documentation</a>). Default: `%a %b %e`.
 * `time_format` (optional): The format string used to format times. Default: `%l:%M %p`.
 * `before` (optional): HTML or text to display before each event. Default: `<li>`.
@@ -41,13 +41,13 @@ The `display_events` function takes the following arguments:
 
 For example, if you want to hide the description and location, you could use something like the following:
 
-`<?php ICalEvents::display_events('url=http://www.ufl.edu/calendar/ufCalendar.ics&number_of_events=3&use_description=0&use_location=0&gmt_start=' . time()); ?>`
+`<?php ICalEvents::display_events('url=http://www.ufl.edu/calendar/ufCalendar.ics&limit=3&use_description=0&use_location=0&gmt_start=' . time()); ?>`
 
 If you need more control over the output, use the `get_events` function, which takes the following arguments:
 * `url: The URL of the iCal file.
-* `start_time` (optional): Only events from this time forward are displayed. If not specified, the earliest events are displayed.
-* `end_time` (optional): Only events before this time are displayed.
-* `number_of_events` (optional): The maximum number of events to display.
+* `gmt_start` (optional): Only events from this time forward are displayed. If not specified, the earliest events are displayed.
+* `gmt_end` (optional): Only events before this time are displayed.
+* `limit` (optional): The maximum number of events to display.
 
 The function returns an array of events, as parsed by `import_ical.php`. For example usage, refer to the `display_events` function in the plugin.
 

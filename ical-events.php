@@ -37,7 +37,7 @@ if (! class_exists('ICalEvents')) {
 
 			if (! isset($r['gmt_start'])) $r['gmt_start'] = null;
 			if (! isset($r['gmt_end'])) $r['gmt_end'] = null;
-			if (! isset($r['number_of_events'])) $r['number_of_events'] = null;
+			if (! isset($r['limit'])) $r['limit'] = null;
 			if (! isset($r['date_format'])) $r['date_format'] = '%a %b %e';
 			if (! isset($r['time_format'])) $r['time_format'] = '%l:%M %p';
 			if (! isset($r['before'])) $r['before'] = '<li>';
@@ -52,15 +52,15 @@ if (! class_exists('ICalEvents')) {
 			if (! isset($r['after_location'])) $r['after_location'] = ')';
 			if (! isset($r['echo'])) $r['echo'] = true;
 
-			ICalEvents::do_display_events($r['url'], $r['gmt_start'], $r['gmt_end'], $r['number_of_events'], $r['date_format'], $r['time_format'], $r['before'], $r['after'], $r['before_date'], $r['after_date'], $r['use_description'], $r['before_description'], $r['after_description'], $r['use_location'], $r['before_location'], $r['after_location'], $r['echo']);
+			ICalEvents::do_display_events($r['url'], $r['gmt_start'], $r['gmt_end'], $r['limit'], $r['date_format'], $r['time_format'], $r['before'], $r['after'], $r['before_date'], $r['after_date'], $r['use_description'], $r['before_description'], $r['after_description'], $r['use_location'], $r['before_location'], $r['after_location'], $r['echo']);
 		}
 
 		/*
 		 * Helper method for displaying events. Note that the API of
 		 * this method may change, so you should use display_events.
 		 */
-		function do_display_events($url, $gmt_start, $gmt_end, $number_of_events, $date_format, $time_format, $before, $after, $before_date, $after_date, $use_description, $before_description, $after_description, $use_location, $before_location, $after_location, $echo) {
-			$events = ICalEvents::get_events($url, $gmt_start, $gmt_end, $number_of_events);
+		function do_display_events($url, $gmt_start, $gmt_end, $limit, $date_format, $time_format, $before, $after, $before_date, $after_date, $use_description, $before_description, $after_description, $use_location, $before_location, $after_location, $echo) {
+			$events = ICalEvents::get_events($url, $gmt_start, $gmt_end, $limit);
 
 			$output = '';
 			foreach ($events as $event) {
@@ -103,10 +103,10 @@ if (! class_exists('ICalEvents')) {
 		 * more on what's available, read import_ical.php or use
 		 * print_r.
 		 */
-		function get_events($url, $gmt_start = null, $gmt_end = null, $number_of_events = null) {
+		function get_events($url, $gmt_start = null, $gmt_end = null, $limit = null) {
 			$filename = ICalEvents::cache_url($url);
 			$events = parse_ical($filename);
-			$events = ICalEvents::constrain($events, $gmt_start, $gmt_end, $number_of_events);
+			$events = ICalEvents::constrain($events, $gmt_start, $gmt_end, $limit);
 
 			return $events;
 		}
@@ -159,24 +159,16 @@ if (! class_exists('ICalEvents')) {
 		 * specified start and end time, up to the specified number of
 		 * events.
 		 */
-		function constrain($events, $gmt_start = null, $gmt_end = null, $number_of_events = null) {
+		function constrain($events, $gmt_start = null, $gmt_end = null, $limit = null) {
 			// Collapse repeating events
-			$repeats = array();
-			foreach ($events as $event) {
-				if (isset($event['Repeat'])) {
-					$r = ICalEvents::get_repeats_between($event, $gmt_start, $gmt_end);
-					if (is_array($r) and count($r) > 0) {
-						$repeats = array_merge($repeats, $r);
-					}
-				}
-			}
-
+			$repeats = ICalEvents::collapse_repeats($events);
 			if (is_array($repeats) and count($repeats) > 0) {
 				$events = array_merge($events, $repeats);
 			}
-			$events = ICalEvents::sort_by_key($events, 'StartTime');
 
-			if (! $number_of_events) $number_of_events = count($events);
+			$events = ICalEvents::sort_by_key($events, 'StartTime');
+			if (! $limit) $limit = count($events);
+
 			$constrained = array();
 			$count = 0;
 			foreach ($events as $event) {
@@ -185,7 +177,7 @@ if (! class_exists('ICalEvents')) {
 					++$count;
 				}
 
-				if ($count >= $number_of_events) break;
+				if ($count >= $limit) break;
 			}
 
 			return $constrained;
@@ -211,6 +203,25 @@ if (! class_exists('ICalEvents')) {
 		function falls_between($event, $gmt_start, $gmt_end) {
 			return ((! $gmt_start or $event['StartTime'] >= $gmt_start)
 				and (! $gmt_end or $event['EndTime'] <= $gmt_end));
+		}
+
+		/*
+		 * Collapse repeating events down to nonrepeating events at the
+		 * corresponding repeat time.
+		 */
+		function collapse_repeats($events) {
+			$repeats = array();
+
+			foreach ($events as $event) {
+				if (isset($event['Repeat'])) {
+					$r = ICalEvents::get_repeats_between($event, $gmt_start, $gmt_end);
+					if (is_array($r) and count($r) > 0) {
+						$repeats = array_merge($repeats, $r);
+					}
+				}
+			}
+
+			return $repeats;
 		}
 
 		/*

@@ -294,7 +294,9 @@ if (! class_exists('ICalEvents')) {
 				}
 			}
 
-			return trim($output);
+			$output = trim(preg_replace('/\s{2,}/', ' ', $output));
+
+			return $output;
 		}
 
 		/*
@@ -350,7 +352,7 @@ if (! class_exists('ICalEvents')) {
 					}
 					$output .= ' ';
 				}
-				$output .= $description;
+				$output .= str_replace('\n', ' ', $description);
 			}
 			else {
 				$output .= ': ' . $summary;

@@ -39,6 +39,10 @@ The `display_events` function takes the following arguments:
 * `after_location` (optional): HTML or text to display after each event's location. Default: `)`.
 * `echo` (optional): Whether or not to directly display the events. Default: `true`.
 
+For example, if you want to hide the description and location, you could use something like the following:
+
+`<?php ICalEvents::display_events('url=http://www.ufl.edu/calendar/ufCalendar.ics&number_of_events=3&use_description=0&use_location=0&gmt_start=' . time()); ?>`
+
 If you need more control over the output, use the `get_events` function, which takes the following arguments:
 * `url: The URL of the iCal file.
 * `start_time` (optional): Only events from this time forward are displayed. If not specified, the earliest events are displayed.

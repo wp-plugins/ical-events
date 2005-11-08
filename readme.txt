@@ -35,9 +35,21 @@ The `display_events` function takes the following arguments:
 * After description (optional): HTML or text to display after each event's description. Default: Empty string.
 * Echo (optional): Whether or not to directly display the events. Default: `true`.
 
+If you need more control over the output, use the `get_events` function, which takes the following arguments:
+* URL: The URL of the iCal file.
+* Start time (optional): Only events from this time forward are displayed. If not specified, the earliest events are displayed.
+* End time (optional): Only events before this time are displayed.
+* Number of events (optional): The maximum number of events to display.
+
+The function returns an array of events, as parsed by `import_ical.php`. For example usage, refer to the `display_events` function in the plugin.
+
 = How often is the calendar checked for new events? =
 
 Once a day. You can change this in the `cache_url` function. Eventually, this might be an option available from the administration screens.
+
+= Does the plugin support repeating events? =
+
+This plugin makes an attempt to support repeating events. However, not all recurrence rules are implemented in the parser. There may also be bugs in how the plugin interprets the parsed data.
 
 = Where can I find iCal files? =
 

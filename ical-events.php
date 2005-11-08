@@ -76,11 +76,11 @@ if (! class_exists('ICalEvents')) {
 
 				if ($use_description) {
 					$output .= $before_description
-						. htmlentities(ICalEvents::format_event_description($event['Summary'], $event['Description']))
+						. ': ' . htmlentities(ICalEvents::format_event_description($event['Summary'], $event['Description']))
 						. $after_description;
 				}
 				else {
-					$output .= htmlentities($event['Summary']);
+					$output .= ': ' . htmlentities($event['Summary']);
 				}
 
 				if ($use_location and $event['Location']) {
@@ -164,11 +164,16 @@ if (! class_exists('ICalEvents')) {
 			$repeats = array();
 			foreach ($events as $event) {
 				if (isset($event['Repeat'])) {
-					$repeats = array_merge($repeats, ICalEvents::get_repeats_between($event, $gmt_start, $gmt_end));
+					$r = ICalEvents::get_repeats_between($event, $gmt_start, $gmt_end);
+					if (is_array($r) and count($r) > 0) {
+						$repeats = array_merge($repeats, $r);
+					}
 				}
 			}
 
-			$events = array_merge($events, $repeats);
+			if (is_array($repeats) and count($repeats) > 0) {
+				$events = array_merge($events, $repeats);
+			}
 			$events = ICalEvents::sort_by_key($events, 'StartTime');
 
 			if (! $number_of_events) $number_of_events = count($events);
@@ -385,7 +390,6 @@ if (! class_exists('ICalEvents')) {
 			$clean_description = str_replace(explode(' ', $ignore_tokens), ' ', $description);
 
 			if ($description) {
-				$output .= ': ';
 				if (strpos($clean_description, $clean_summary) === false) {
 					$output .= $summary;
 					if ($summary[strlen($summary) - 1] != '.') {
@@ -396,7 +400,7 @@ if (! class_exists('ICalEvents')) {
 				$output .= str_replace('\n', ' ', $description);
 			}
 			else {
-				$output .= ': ' . $summary;
+				$output .= $summary;
 			}
 
 			return $output;

@@ -139,6 +139,8 @@ if (! class_exists('ICalEvents')) {
 				if ($count >= $number_of_events) break;
 			}
 
+			print_r($constrained);
+
 			return $constrained;
 		}
 
@@ -172,41 +174,26 @@ if (! class_exists('ICalEvents')) {
 		function get_repeats_between($event, $gmt_start, $gmt_end) {
 			global $ICAL_EVENTS_REPEAT_INTERVALS;
 
-			/*
-			echo "get_repeat_between: event = [\n";
-			print_r($event);
-			echo "], gmt_start = [$gmt_start], gmt_end = [$gmt_end]\n";
-			*/
-
 			$rr = $event['Repeat'];
 			if ($gmt_end and $gmt_end >= $rr['EndTime']) return;
-
-			$duration = 0;
-			if (isset($event['EndTime'])) {
-				$duration = $event['EndTime'] - $event['StartTime'];
-			}
 
 			$repeats = array();
 			if (isset($ICAL_EVENTS_REPEAT_INTERVALS[$rr['Interval']])) {
 				$interval    = $ICAL_EVENTS_REPEAT_INTERVALS[$rr['Interval']] * $rr['Frequency'];
-				$repeat_days = preg_split('//', $rr['RepeatDays'], -1, PREG_SPLIT_NO_EMPTY);
+				$repeat_days = ICalEvents::get_repeat_days($rr['RepeatDays']);
 
 				$current_time = $event['StartTime'];
 				while ($current_time <= $rr['EndTime']) {
-					$repeat = $event;
-					unset($repeat['Repeat']);
-
-					$repeat['StartTime'] = $current_time;
-					if ($duration > 0) {
-						$repeat['EndTime'] = $current_time + $duration;
+					if ($repeat_days) {
+						foreach ($repeat_days as $repeat_day) {
+							$repeat = ICalEvents::get_repeat($event, $current_time, $repeat_day);
+							if (ICalEvents::falls_between($repeat, $gmt_start, $gmt_end)) $repeats[] = $repeat;
+						}
 					}
-
-					if (ICalEvents::falls_between($repeat, $gmt_start, $gmt_end)) {
-						$repeats[] = $repeat;
+					else {
+						$repeat = ICalEvents::get_simple_repeat($event, $current_time);
+						if (ICalEvents::falls_between($repeat, $gmt_start, $gmt_end)) $repeats[] = $repeat;
 					}
-
-					// TODO: Handle repeat days
-					// TODO: Handle exceptions
 
 					$current_time += $interval;
 				}
@@ -216,6 +203,51 @@ if (! class_exists('ICalEvents')) {
 			}
 
 			return $repeats;
+		}
+
+		function get_repeat_days($yes_no) {
+			$repeat_days = array();
+			for ($i = 0; $i < strlen($yes_no); $i++) {
+				if ($yes_no[$i] == 'y') $repeat_days[] = $i;
+			}
+
+			return $repeat_days;
+		}
+
+		function get_repeat($event, $current_time, $repeat_day) {
+			$date = getdate($event['StartTime']);
+			$wday = $date['wday'];
+
+			$offset = ($repeat_day - $wday) * 24 * 60 * 60;
+
+			$repeat = ICalEvents::get_simple_repeat($event, $current_time);
+
+			$repeat['StartTime'] += $offset;
+			if ($repeat['EndTime']) {
+				$repeat['EndTime'] += $offset;
+			}
+
+			return $repeat;
+		}
+
+		function get_simple_repeat($event, $current_time) {
+			$duration = 0;
+			if (isset($event['Duration'])) {
+				$duration = $event['Duration'] * 60;
+			}
+			else if (isset($event['EndTime'])) {
+				$duration = $event['EndTime'] - $event['StartTime'];
+			}
+
+			$repeat = $event;
+			unset($repeat['Repeat']);
+
+			$repeat['StartTime'] = $current_time;
+			if ($duration > 0) {
+				$repeat['EndTime'] = $current_time + $duration;
+			}
+
+			return $repeat;
 		}
 
 		/*
@@ -289,14 +321,14 @@ if (! class_exists('ICalEvents')) {
 			$clean_description = str_replace(explode(' ', $ignore_tokens), ' ', $description);
 
 			if ($description) {
-				$output .= ": ";
+				$output .= ': ';
 				if (strpos($clean_description, $clean_summary) === false) {
-					$output .= $summary . ". ";
+					$output .= $summary . '. ';
 				}
 				$output .= $description;
 			}
 			else {
-				$output .= ": " . $summary;
+				$output .= ': ' . $summary;
 			}
 
 			return $output;

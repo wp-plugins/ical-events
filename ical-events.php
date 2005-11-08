@@ -3,7 +3,7 @@
 Plugin Name: iCal Events
 Version: 1.4
 Plugin URI: http://dev.webadmin.ufl.edu/~dwc/2005/03/10/ical-events-plugin/
-Description: Display events from an iCal source. Requires <a href="http://cvs.sourceforge.net/viewcvs.py/webcalendar/webcalendar/import_ical.php?rev=HEAD">import_ical.php</a> from the <a href="http://sourceforge.net/projects/webcalendar/">WebCalendar</a> project.
+Description: Display events from an iCal source. Uses <a href="http://cvs.sourceforge.net/viewcvs.py/webcalendar/webcalendar/import_ical.php?rev=HEAD">import_ical.php</a> from the <a href="http://sourceforge.net/projects/webcalendar/">WebCalendar</a> project.
 Author: Daniel Westermann-Clark
 Author URI: http://dev.webadmin.ufl.edu/~dwc/
 */
@@ -139,8 +139,6 @@ if (! class_exists('ICalEvents')) {
 				if ($count >= $number_of_events) break;
 			}
 
-			print_r($constrained);
-
 			return $constrained;
 		}
 
@@ -170,6 +168,8 @@ if (! class_exists('ICalEvents')) {
 		 * If the specified event repeats between the given start and
 		 * end times, return one or more nonrepeating events at the
 		 * corresponding times.
+		 * TODO: Only handles some types of repeating events
+		 * TODO: Check for exceptions to the RRULE
 		 */
 		function get_repeats_between($event, $gmt_start, $gmt_end) {
 			global $ICAL_EVENTS_REPEAT_INTERVALS;
@@ -182,20 +182,20 @@ if (! class_exists('ICalEvents')) {
 				$interval    = $ICAL_EVENTS_REPEAT_INTERVALS[$rr['Interval']] * $rr['Frequency'];
 				$repeat_days = ICalEvents::get_repeat_days($rr['RepeatDays']);
 
-				$current_time = $event['StartTime'];
-				while ($current_time <= $rr['EndTime']) {
+				$count = 0;
+				while ($event['StartTime'] + $interval * $count <= $rr['EndTime']) {
 					if ($repeat_days) {
 						foreach ($repeat_days as $repeat_day) {
-							$repeat = ICalEvents::get_repeat($event, $current_time, $repeat_day);
+							$repeat = ICalEvents::get_repeat($event, $interval, $count, $repeat_day);
 							if (ICalEvents::falls_between($repeat, $gmt_start, $gmt_end)) $repeats[] = $repeat;
 						}
 					}
 					else {
-						$repeat = ICalEvents::get_simple_repeat($event, $current_time);
+						$repeat = ICalEvents::get_simple_repeat($event, $interval, $count);
 						if (ICalEvents::falls_between($repeat, $gmt_start, $gmt_end)) $repeats[] = $repeat;
 					}
 
-					$current_time += $interval;
+					++$count;
 				}
 			}
 			else {
@@ -214,23 +214,22 @@ if (! class_exists('ICalEvents')) {
 			return $repeat_days;
 		}
 
-		function get_repeat($event, $current_time, $repeat_day) {
+		function get_repeat($event, $interval, $count, $repeat_day) {
+			$repeat = ICalEvents::get_simple_repeat($event, $interval, $count);
+
 			$date = getdate($event['StartTime']);
 			$wday = $date['wday'];
-
 			$offset = ($repeat_day - $wday) * 24 * 60 * 60;
 
-			$repeat = ICalEvents::get_simple_repeat($event, $current_time);
-
 			$repeat['StartTime'] += $offset;
-			if ($repeat['EndTime']) {
+			if (isset($repeat['EndTime'])) {
 				$repeat['EndTime'] += $offset;
 			}
 
 			return $repeat;
 		}
 
-		function get_simple_repeat($event, $current_time) {
+		function get_simple_repeat($event, $interval, $count) {
 			$duration = 0;
 			if (isset($event['Duration'])) {
 				$duration = $event['Duration'] * 60;
@@ -242,10 +241,15 @@ if (! class_exists('ICalEvents')) {
 			$repeat = $event;
 			unset($repeat['Repeat']);
 
-			$repeat['StartTime'] = $current_time;
+			$repeat['StartTime'] += $interval * $count;
 			if ($duration > 0) {
-				$repeat['EndTime'] = $current_time + $duration;
+				$repeat['EndTime'] = $repeat['StartTime'] + $duration;
 			}
+
+			// Handle timezone changes since the initial event date
+			$offset = date('Z', $event['StartTime']) - date('Z', $repeat['StartTime']);
+			$repeat['StartTime'] += $offset;
+			$repeat['EndTime'] += $offset;
 
 			return $repeat;
 		}
@@ -273,7 +277,7 @@ if (! class_exists('ICalEvents')) {
 				}
 			}
 
-			return $output;
+			return trim($output);
 		}
 
 		/*

@@ -9,5 +9,5 @@ $url  = $argv[1];
 $time = (isset($argv[2]) ? $argv[2] : time());
 $num  = (isset($argv[3]) ? $argv[3] : 5);
 
-ICalEvents::display_events($url, $time, NULL, $num);
+ICalEvents::display_events("url=$url&gmt_start=$time&number_of_events=$num");
 ?>

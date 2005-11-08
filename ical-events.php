@@ -11,7 +11,7 @@ Author URI: http://dev.webadmin.ufl.edu/~dwc/
 require('import_ical.php');
 
 /*
- * As defined by import_ical.php, though not exported...
+ * As defined by import_ical.php
  */
 $ICAL_EVENTS_REPEAT_INTERVALS = array(
 	1 => 24 * 60 * 60,        // Daily
@@ -205,6 +205,10 @@ if (! class_exists('ICalEvents')) {
 			return $repeats;
 		}
 
+		/*
+		 * Given a string like 'nynynyn' from import_ical.php, return
+		 * an array containing the weekday numbers (0 = Sun, 6 = Sat).
+		 */
 		function get_repeat_days($yes_no) {
 			$repeat_days = array();
 			for ($i = 0; $i < strlen($yes_no); $i++) {
@@ -214,6 +218,11 @@ if (! class_exists('ICalEvents')) {
 			return $repeat_days;
 		}
 
+		/*
+		 * Using the specified event as a base, return the repeating
+		 * event the given number of intervals (in seconds) in the
+		 * future on the repeat day (0 = Sun, 6 = Sat).
+		 */
 		function get_repeat($event, $interval, $count, $repeat_day) {
 			$repeat = ICalEvents::get_simple_repeat($event, $interval, $count);
 
@@ -229,6 +238,11 @@ if (! class_exists('ICalEvents')) {
 			return $repeat;
 		}
 
+		/*
+		 * Using the specified event as a base, return the repeating
+		 * event the given number of intervals (in seconds) in the
+		 * future.
+		 */
 		function get_simple_repeat($event, $interval, $count) {
 			$duration = 0;
 			if (isset($event['Duration'])) {

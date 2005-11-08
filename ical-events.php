@@ -105,25 +105,27 @@ if (! class_exists('ICalEvents')) {
 		 * events.
 		 */
 		function constrain($events, $gmt_start = null, $gmt_end = null, $number_of_events = null) {
+			// Collapse repeating events
+			$repeats = array();
+			foreach ($events as $event) {
+				if (isset($event['Repeat'])) {
+					$repeats = array_merge($repeats, ICalEvents::get_repeats_between($event, $gmt_start, $gmt_end));
+				}
+			}
+
+			$events = array_merge($events, $repeats);
 			$events = ICalEvents::sort_by_key($events, 'StartTime');
 
+			if (! $number_of_events) $number_of_events = count($events);
 			$constrained = array();
 			$count = 0;
 			foreach ($events as $event) {
 				if (ICalEvents::falls_between($event, $gmt_start, $gmt_end)) {
 					$constrained[] = $event;
+					++$count;
 				}
-				else if (isset($event['Repeat'])) {
-					$repeats = ICalEvents::get_repeats_between($event, $gmt_start, $gmt_end);
-					foreach ($repeats as $repeat) {
-						$constrained[] = $repeat;
-					}
-				}
-			}
 
-			// TODO: This really should be done in the loop
-			if ($number_of_events) {
-				$constrained = array_splice($constrained, 0, $number_of_events);
+				if ($count >= $number_of_events) break;
 			}
 
 			return $constrained;
@@ -190,6 +192,7 @@ if (! class_exists('ICalEvents')) {
 
 					if (ICalEvents::falls_between($repeat, $gmt_start, $gmt_end)) {
 						$repeats[] = $repeat;
+						print_r($repeat);
 					}
 
 					// TODO: Handle repeat days

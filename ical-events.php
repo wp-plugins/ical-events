@@ -182,7 +182,7 @@ if (! class_exists('ICalEvents')) {
 
 			$repeats = array();
 			if (isset($ICAL_EVENTS_REPEAT_INTERVALS[$rr['Interval']])) {
-				$interval    = $ICAL_EVENTS_REPEAT_INTERVALS[$rr['Interval']] * $rr['Frequency'];
+				$interval    = $ICAL_EVENTS_REPEAT_INTERVALS[$rr['Interval']] * (isset($rr['Frequency']) ? $rr['Frequency'] : 1);
 				$repeat_days = ICalEvents::get_repeat_days($rr['RepeatDays']);
 
 				$count = 0;

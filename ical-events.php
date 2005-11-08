@@ -31,7 +31,7 @@ if (! class_exists('ICalEvents')) {
 			parse_str($args, $r);
 
 			if (! isset($r['url'])) {
-				echo "ical-events: No URL specified";
+				echo "iCal Events: No URL specified";
 				return;
 			}
 
@@ -106,6 +106,11 @@ if (! class_exists('ICalEvents')) {
 		function get_events($url, $gmt_start = null, $gmt_end = null, $limit = null) {
 			$filename = ICalEvents::cache_url($url);
 			$events = parse_ical($filename);
+			if (! is_array($events) or count($events) <= 0) {
+				echo "iCal Events: Error parsing calendar";
+				return;
+			}
+
 			$events = ICalEvents::constrain($events, $gmt_start, $gmt_end, $limit);
 
 			return $events;
@@ -160,8 +165,7 @@ if (! class_exists('ICalEvents')) {
 		 * events.
 		 */
 		function constrain($events, $gmt_start = null, $gmt_end = null, $limit = null) {
-			// Collapse repeating events
-			$repeats = ICalEvents::collapse_repeats($events);
+			$repeats = ICalEvents::collapse_repeats($events, $gmt_start, $gmt_end);
 			if (is_array($repeats) and count($repeats) > 0) {
 				$events = array_merge($events, $repeats);
 			}
@@ -235,11 +239,10 @@ if (! class_exists('ICalEvents')) {
 			global $ICAL_EVENTS_REPEAT_INTERVALS;
 
 			$rr = $event['Repeat'];
-			if ($gmt_end and $gmt_end >= $rr['EndTime']) return;
 
 			$repeats = array();
 			if (isset($ICAL_EVENTS_REPEAT_INTERVALS[$rr['Interval']])) {
-				$interval    = $ICAL_EVENTS_REPEAT_INTERVALS[$rr['Interval']] * (isset($rr['Frequency']) ? $rr['Frequency'] : 1);
+				$interval    = $ICAL_EVENTS_REPEAT_INTERVALS[$rr['Interval']] * ($rr['Frequency'] ? $rr['Frequency'] : 1);
 				$repeat_days = ICalEvents::get_repeat_days($rr['RepeatDays']);
 
 				$count = 0;

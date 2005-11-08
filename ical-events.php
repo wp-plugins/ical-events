@@ -341,7 +341,11 @@ if (! class_exists('ICalEvents')) {
 			if ($description) {
 				$output .= ': ';
 				if (strpos($clean_description, $clean_summary) === false) {
-					$output .= $summary . '. ';
+					$output .= $summary;
+					if ($summary[strlen($summary) - 1] != '.') {
+						$output .= '.';
+					}
+					$output .= ' ';
 				}
 				$output .= $description;
 			}

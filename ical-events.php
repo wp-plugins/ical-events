@@ -27,9 +27,7 @@ if (! class_exists('ICalEvents')) {
 		 * constraints are optional.
 		 */
 		function display_events($url, $gmt_start = null, $gmt_end = null, $number_of_events = null, $date_format = '%a %b %e', $time_format = '%l:%M %p', $before = '<li>', $after = '</li>', $before_date = '<strong>', $after_date = '</strong>', $before_description = '', $after_description = '', $echo = true) {
-			$filename = ICalEvents::cache_url($url);
-			$events = parse_ical($filename);
-			$events = ICalEvents::constrain($events, $gmt_start, $gmt_end, $number_of_events);
+			$events = ICalEvents::get_events($url, $gmt_start, $gmt_end, $number_of_events);
 
 			$output = '';
 			foreach ($events as $event) {
@@ -54,6 +52,19 @@ if (! class_exists('ICalEvents')) {
 			}
 
 			return $output;
+		}
+
+		/*
+		 * Return a list of events from the specified calendar.  For
+		 * more on what's available, read import_ical.php or use
+		 * print_r.
+		 */
+		function get_events($url, $gmt_start = null, $gmt_end = null, $number_of_events = null) {
+			$filename = ICalEvents::cache_url($url);
+			$events = parse_ical($filename);
+			$events = ICalEvents::constrain($events, $gmt_start, $gmt_end, $number_of_events);
+
+			return $events;
 		}
 
 		/*
@@ -192,7 +203,6 @@ if (! class_exists('ICalEvents')) {
 
 					if (ICalEvents::falls_between($repeat, $gmt_start, $gmt_end)) {
 						$repeats[] = $repeat;
-						print_r($repeat);
 					}
 
 					// TODO: Handle repeat days

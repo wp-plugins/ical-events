@@ -10,6 +10,8 @@ Author URI: http://dev.webadmin.ufl.edu/~dwc/
 
 require_once('import_ical.php');
 
+define('ICAL_EVENTS_CACHE_LIFETIME', 86400);  // seconds
+
 /*
  * As defined by import_ical.php
  */
@@ -147,7 +149,7 @@ if (! class_exists('ICalEvents')) {
 		function cache_url($url) {
 			$filename = ICalEvents::get_cache_path() . basename($url);
 
-			if (! file_exists($filename) or time() - filemtime($filename) >= 24 * 60 * 60) {
+			if (! file_exists($filename) or time() - filemtime($filename) >= ICAL_EVENTS_CACHE_LIFETIME) {
 				$src  = fopen($url, 'r') or die("Error opening $url");
 				$dest = fopen($filename, 'w') or die("Error opening $filename");
 
@@ -294,7 +296,7 @@ if (! class_exists('ICalEvents')) {
 
 			$date = getdate($event['StartTime']);
 			$wday = $date['wday'];
-			$offset = ($repeat_day - $wday) * 24 * 60 * 60;
+			$offset = ($repeat_day - $wday) * 86400;
 
 			$repeat['StartTime'] += $offset;
 			if (isset($repeat['EndTime'])) {
@@ -378,8 +380,7 @@ if (! class_exists('ICalEvents')) {
 			$local1 = localtime(($gmt1 <= $gmt2 ? $gmt1 : $gmt2), 1);
 			$local2 = localtime(($gmt1 <= $gmt2 ? $gmt2 : $gmt1), 1);
 
-			return (abs($gmt2 - $gmt1) == 24 * 60 * 60
-				and $local1['tm_hour'] == $local2['tm_hour']
+			return (abs($gmt2 - $gmt1) == 86400
 				and $local1['tm_hour'] == 0
 				and $local1['tm_year'] == $local2['tm_year']);
 		}

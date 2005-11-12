@@ -50,6 +50,7 @@ if (! class_exists('ICalEvents')) {
 			if (! isset($r['before_summary'])) $r['before_summary'] = '';
 			if (! isset($r['after_summary'])) $r['after_summary'] = ' - ';
 			if (! isset($r['use_description'])) $r['use_description'] = true;
+			if (! isset($r['replace_newlines_with'])) $r['replace_newlines_with'] = '<br />';
 			if (! isset($r['before_description'])) $r['before_description'] = '';
 			if (! isset($r['after_description'])) $r['after_description'] = '';
 			if (! isset($r['use_location'])) $r['use_location'] = true;
@@ -57,14 +58,14 @@ if (! class_exists('ICalEvents')) {
 			if (! isset($r['after_location'])) $r['after_location'] = ')';
 			if (! isset($r['echo'])) $r['echo'] = true;
 
-			ICalEvents::do_display_events($r['url'], $r['gmt_start'], $r['gmt_end'], $r['limit'], $r['date_format'], $r['time_format'], $r['before'], $r['after'], $r['before_date'], $r['after_date'], $r['use_summary'], $r['before_summary'], $r['after_summary'], $r['use_description'], $r['before_description'], $r['after_description'], $r['use_location'], $r['before_location'], $r['after_location'], $r['echo']);
+			ICalEvents::do_display_events($r['url'], $r['gmt_start'], $r['gmt_end'], $r['limit'], $r['date_format'], $r['time_format'], $r['before'], $r['after'], $r['before_date'], $r['after_date'], $r['use_summary'], $r['before_summary'], $r['after_summary'], $r['use_description'], $r['before_description'], $r['after_description'], $r['replace_newlines_with'], $r['use_location'], $r['before_location'], $r['after_location'], $r['echo']);
 		}
 
 		/*
 		 * Helper method for displaying events. Note that the API of
 		 * this method may change, so you should use display_events.
 		 */
-		function do_display_events($url, $gmt_start, $gmt_end, $limit, $date_format, $time_format, $before, $after, $before_date, $after_date, $use_summary, $before_summary, $after_summary, $use_description, $before_description, $after_description, $use_location, $before_location, $after_location, $echo) {
+		function do_display_events($url, $gmt_start, $gmt_end, $limit, $date_format, $time_format, $before, $after, $before_date, $after_date, $use_summary, $before_summary, $after_summary, $use_description, $before_description, $after_description, $replace_newlines_with, $use_location, $before_location, $after_location, $echo) {
 			$events = ICalEvents::get_events($url, $gmt_start, $gmt_end, $limit);
 
 			$output = '';
@@ -85,14 +86,18 @@ if (! class_exists('ICalEvents')) {
 				}
 
 				if ($use_description and $event['Description']) {
-					$output .= $before_description . htmlentities($event['Description']) . $after_description;
+					$output .= $before_description;
+					if ($replace_newlines_with) {
+						$output .= str_replace("\n", $replace_newlines_with, htmlentities($event['Description']));
+					}
+					$output .= $after_description;
 				}
 
 				if ($use_location and $event['Location']) {
 					$output .= $before_location . htmlentities($event['Location']) . $after_location;
 				}
 
-				$output .= "<!-- " . htmlentities($event['UID']) . " -->";
+				$output .= '<!-- ' . htmlentities($event['UID']) . ' -->';
 				$output .= $after . "\n";
 			}
 

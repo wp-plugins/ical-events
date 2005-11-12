@@ -37,6 +37,7 @@ The `display_events` function takes the following arguments:
 * `use_description` (optional): Whether or not to use the event description in the output. Default: `true`.
 * `before_description` (optional): HTML or text to display before each event's description. Default: Empty string.
 * `after_description` (optional): HTML or text to display after each event's description. Default: Empty string.
+* `replace_newlines_with` (optional): String with which to replace newlines in the description. Default: `<br />`.
 * `use_location` (optional): Whether or not to use the event location in the output. If false, only the summary is used. Default: `true`.
 * `before_location` (optional): HTML or text to display before each event's location. Default: `` (`.
 * `after_location` (optional): HTML or text to display after each event's location. Default: `)`.
@@ -56,7 +57,7 @@ The function returns an array of events, as parsed by `import_ical.php`. For exa
 
 = How often is the calendar checked for new events? =
 
-Once a day. You can change this in the `cache_url` function. Eventually, this might be an option available from the administration screens.
+Once a day. You can change this using the ICAL_EVENTS_CACHE_LIFETIME near the top of the plugin.
 
 = Does the plugin support repeating events? =
 

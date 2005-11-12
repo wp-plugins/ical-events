@@ -251,9 +251,9 @@ function format_ical($event) {
     }
   }
 
-  $fevent['Summary'] = $event['summary'];
-  $fevent['Description'] = $event['description'];
-  $fevent['Location'] = $event['location'];
+  $fevent['Summary'] = format_ical_text($event['summary']);
+  $fevent['Description'] = format_ical_text($event['description']);
+  $fevent['Location'] = format_ical_text($event['location']);
   $fevent['Private'] = preg_match("/private|confidential/i", $event['class']) ? '1' : '0';
   $fevent['UID'] = $event['uid'];
 
@@ -403,6 +403,17 @@ function rrule_endtime($int,$freq,$start,$end) {
     $endtime = icaldate_to_timestamp($end);
   }
   return $endtime;
+}
+
+// Replace RFC 2445 escape characters
+function format_ical_text($value) {
+  $output = str_replace(
+    array('\\\\', '\;', '\,', '\N', '\n'),
+    array('\\',   ';',  ',',  "\n", "\n"),
+    $value
+  );
+
+  return $output;
 }
 
 ?>

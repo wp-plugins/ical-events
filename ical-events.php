@@ -43,7 +43,10 @@ if (! class_exists('ICalEvents')) {
 			if (! isset($r['before'])) $r['before'] = '<li>';
 			if (! isset($r['after'])) $r['after'] = '</li>';
 			if (! isset($r['before_date'])) $r['before_date'] = '<strong>';
-			if (! isset($r['after_date'])) $r['after_date'] = '</strong>';
+			if (! isset($r['after_date'])) $r['after_date'] = '</strong>: ';
+			if (! isset($r['use_summary'])) $r['use_summary'] = true;
+			if (! isset($r['before_summary'])) $r['before_summary'] = '';
+			if (! isset($r['after_summary'])) $r['after_summary'] = ' - ';
 			if (! isset($r['use_description'])) $r['use_description'] = true;
 			if (! isset($r['before_description'])) $r['before_description'] = '';
 			if (! isset($r['after_description'])) $r['after_description'] = '';
@@ -52,19 +55,20 @@ if (! class_exists('ICalEvents')) {
 			if (! isset($r['after_location'])) $r['after_location'] = ')';
 			if (! isset($r['echo'])) $r['echo'] = true;
 
-			ICalEvents::do_display_events($r['url'], $r['gmt_start'], $r['gmt_end'], $r['limit'], $r['date_format'], $r['time_format'], $r['before'], $r['after'], $r['before_date'], $r['after_date'], $r['use_description'], $r['before_description'], $r['after_description'], $r['use_location'], $r['before_location'], $r['after_location'], $r['echo']);
+			ICalEvents::do_display_events($r['url'], $r['gmt_start'], $r['gmt_end'], $r['limit'], $r['date_format'], $r['time_format'], $r['before'], $r['after'], $r['before_date'], $r['after_date'], $r['use_summary'], $r['before_summary'], $r['after_summary'], $r['use_description'], $r['before_description'], $r['after_description'], $r['use_location'], $r['before_location'], $r['after_location'], $r['echo']);
 		}
 
 		/*
 		 * Helper method for displaying events. Note that the API of
 		 * this method may change, so you should use display_events.
 		 */
-		function do_display_events($url, $gmt_start, $gmt_end, $limit, $date_format, $time_format, $before, $after, $before_date, $after_date, $use_description, $before_description, $after_description, $use_location, $before_location, $after_location, $echo) {
+		function do_display_events($url, $gmt_start, $gmt_end, $limit, $date_format, $time_format, $before, $after, $before_date, $after_date, $use_summary, $before_summary, $after_summary, $use_description, $before_description, $after_description, $use_location, $before_location, $after_location, $echo) {
 			$events = ICalEvents::get_events($url, $gmt_start, $gmt_end, $limit);
 
 			$output = '';
 			foreach ($events as $event) {
 				$output .= $before;
+
 				$output .= $before_date;
 				if (ICalEvents::is_all_day($event['StartTime'], $event['EndTime'])) {
 					$output .= htmlentities(strftime($date_format, $event['StartTime']));
@@ -74,13 +78,12 @@ if (! class_exists('ICalEvents')) {
 				}
 				$output .= $after_date;
 
-				if ($use_description) {
-					$output .= $before_description
-						. ': ' . htmlentities(ICalEvents::format_event_description($event['Summary'], $event['Description']))
-						. $after_description;
+				if ($use_summary and $event['Summary']) {
+					$output .= $before_summary . htmlentities($event['Summary']) . $after_summary;
 				}
-				else {
-					$output .= ': ' . htmlentities($event['Summary']);
+
+				if ($use_description and $event['Description']) {
+					$output .= $before_description . htmlentities($event['Description']) . $after_description;
 				}
 
 				if ($use_location and $event['Location']) {
@@ -391,33 +394,6 @@ if (! class_exists('ICalEvents')) {
 			return ($local1['tm_mday'] == $local2['tm_mday']
 				and $local1['tm_mon'] == $local2['tm_mon']
 				and $local1['tm_year'] == $local2['tm_year']);
-		}
-
-		/*
-		 * Return a string describing an event with the specified
-		 * summary and description.
-		 */
-		function format_event_description($summary, $description, $ignore_tokens = ', . "') {
-			$output = '';
-
-			$clean_summary = str_replace(explode(' ', $ignore_tokens), ' ', $summary);
-			$clean_description = str_replace(explode(' ', $ignore_tokens), ' ', $description);
-
-			if ($description) {
-				if (strpos($clean_description, $clean_summary) === false) {
-					$output .= $summary;
-					if ($summary[strlen($summary) - 1] != '.') {
-						$output .= '.';
-					}
-					$output .= ' ';
-				}
-				$output .= str_replace('\n', ' ', $description);
-			}
-			else {
-				$output .= $summary;
-			}
-
-			return $output;
 		}
 	}
 }

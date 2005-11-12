@@ -30,8 +30,11 @@ The `display_events` function takes the following arguments:
 * `before` (optional): HTML or text to display before each event. Default: `<li>`.
 * `after` (optional): HTML or text to display after each event. Default: `</li>`.
 * `before_date` (optional): HTML or text to display before each event's date. Default: `<strong>`.
-* `after_date` (optional): HTML or text to display after each event's date. Default: `</strong>`.
-* `use_description` (optional): Whether or not to use the event description in the output. If false, only the summary is used. Default: `true`.
+* `after_date` (optional): HTML or text to display after each event's date. Default: `</strong>: `.
+* `use_summary` (optional): Whether or not to use the event summary in the output. Default: `true`.
+* `before_summary` (optional): HTML or text to display before each event's summary. Default: Empty string.
+* `after_summary` (optional): HTML or text to display after each event's summary. Default: ` - `.
+* `use_description` (optional): Whether or not to use the event description in the output. Default: `true`.
 * `before_description` (optional): HTML or text to display before each event's description. Default: Empty string.
 * `after_description` (optional): HTML or text to display after each event's description. Default: Empty string.
 * `use_location` (optional): Whether or not to use the event location in the output. If false, only the summary is used. Default: `true`.

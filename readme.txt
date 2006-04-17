@@ -4,7 +4,7 @@ Contributors: dwc
 
 A plugin for getting and displaying upcoming events from a shared calendar.
 
-This plugin uses <a href="http://cvs.sourceforge.net/viewcvs.py/webcalendar/webcalendar/import_ical.php?rev=HEAD">import_ical.php</a> from the <a href="http://sourceforge.net/projects/webcalendar/">WebCalendar</a> project.
+This plugin uses <a href="http://cvs.sourceforge.net/viewcvs.py/webcalendar/webcalendar/import_ical.php?rev=HEAD">import_ical.php</a> from the <a href="http://sourceforge.net/projects/webcalendar/">WebCalendar</a> project. A slightly modified version of their parser is provided with this plugin.
 
 == Installation ==
 
@@ -41,6 +41,7 @@ The `display_events` function takes the following arguments:
 * `use_location` (optional): Whether or not to use the event location in the output. If false, only the summary is used. Default: `true`.
 * `before_location` (optional): HTML or text to display before each event's location. Default: `` (`.
 * `after_location` (optional): HTML or text to display after each event's location. Default: `)`.
+* `use_url` (optional): Whether or not to use the event URL in the output. If true, the event URL is made into a link around the event summary. Default: `true`.
 * `echo` (optional): Whether or not to directly display the events. Default: `true`.
 
 For example, if you want to hide the description and location, you could use something like the following:
@@ -68,3 +69,4 @@ This plugin makes an attempt to support repeating events. However, not all recur
 There are many iCal sources, such as:
 * <a href="http://www.apple.com/ical/library/">Apple's iCal library</a>
 * <a href="http://www.icalshare.com/">iCalShare</a>
+* <a href="http://calendar.google.com/">Google Calendar</a>

@@ -143,7 +143,7 @@ if (! class_exists('ICalEvents')) {
 		function cache_url($url) {
 			$filename = ICalEvents::get_cache_path() . ICalEvents::get_cache_filename($url);
 
-			if (! file_exists($filename) or time() - filemtime($filename) >= ICAL_EVENTS_CACHE_LIFETIME) {
+			if (! file_exists($filename) or time() - filemtime($filename) >= ICAL_EVENTS_CACHE_TTL) {
 				$src  = fopen($url, 'r') or die("Error opening $url");
 				$dest = fopen($filename, 'w') or die("Error opening $filename");
 

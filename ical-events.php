@@ -49,10 +49,10 @@ if (! class_exists('ICalEvents')) {
 			if (! isset($r['after_date'])) $r['after_date'] = '</strong>: ';
 			if (! isset($r['use_summary'])) $r['use_summary'] = true;
 			if (! isset($r['before_summary'])) $r['before_summary'] = '';
-			if (! isset($r['after_summary'])) $r['after_summary'] = ' - ';
+			if (! isset($r['after_summary'])) $r['after_summary'] = '';
 			if (! isset($r['use_description'])) $r['use_description'] = true;
 			if (! isset($r['replace_newlines_with'])) $r['replace_newlines_with'] = '<br />';
-			if (! isset($r['before_description'])) $r['before_description'] = '';
+			if (! isset($r['before_description'])) $r['before_description'] = ' - ';
 			if (! isset($r['after_description'])) $r['after_description'] = '';
 			if (! isset($r['use_location'])) $r['use_location'] = true;
 			if (! isset($r['before_location'])) $r['before_location'] = ' (';

@@ -10,7 +10,8 @@ Author URI: http://dev.webadmin.ufl.edu/~dwc/
 
 require_once('import_ical.php');
 
-define('ICAL_EVENTS_CACHE_LIFETIME', 86400);  // seconds
+define('ICAL_EVENTS_CACHE_TTL', 24 * 60 * 60);  // 1 day
+define('ICAL_EVENTS_CACHE_DEFAULT_EXTENSION', 'ics');
 
 /*
  * As defined by import_ical.php
@@ -136,6 +137,28 @@ if (! class_exists('ICalEvents')) {
 		}
 
 		/*
+		 * Cache the specified URL and return the name of the
+		 * destination file.
+		 */
+		function cache_url($url) {
+			$filename = ICalEvents::get_cache_path() . ICalEvents::get_cache_filename($url);
+
+			if (! file_exists($filename) or time() - filemtime($filename) >= ICAL_EVENTS_CACHE_LIFETIME) {
+				$src  = fopen($url, 'r') or die("Error opening $url");
+				$dest = fopen($filename, 'w') or die("Error opening $filename");
+
+				while ($data = fread($src, 8192)) {
+					fwrite($dest, $data);
+				}
+
+				fclose($src);
+				fclose($dest);
+			}
+
+			return $filename;
+		}
+
+		/*
 		 * Attempt to create the cache directory if it doesn't exist.
 		 * Return the path if successful.
 		 */
@@ -157,25 +180,17 @@ if (! class_exists('ICalEvents')) {
 		}
 
 		/*
-		 * Cache the specified URL and return the name of the
-		 * destination file.
+		 * Return the cache filename for the specified URL.
 		 */
-		function cache_url($url) {
-			$filename = ICalEvents::get_cache_path() . basename($url);
+		function get_cache_filename($url) {
+			$extension = ICAL_EVENTS_CACHE_DEFAULT_EXTENSION;
 
-			if (! file_exists($filename) or time() - filemtime($filename) >= ICAL_EVENTS_CACHE_LIFETIME) {
-				$src  = fopen($url, 'r') or die("Error opening $url");
-				$dest = fopen($filename, 'w') or die("Error opening $filename");
-
-				while ($data = fread($src, 8192)) {
-					fwrite($dest, $data);
-				}
-
-				fclose($src);
-				fclose($dest);
+			$matches = array();
+			if (preg_match('/\.(\w+)$/', $url, $matches)) {
+				$extension = $matches[1];
 			}
 
-			return $filename;
+			return md5($url) . ".$extension";
 		}
 
 		/*

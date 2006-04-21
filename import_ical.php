@@ -78,37 +78,34 @@ function parse_ical ( $cal_file ) {
             $subsubstate = $match[1];
           }
            // we suppose ":" is on the same line as property name, this can perhaps cause problems
-	  else if (preg_match("/^SUMMARY.*:(.+)$/i", $buff, $match)) {
+	  else if (preg_match("/^SUMMARY[^:]*:(.+)$/i", $buff, $match)) {
               $substate = "summary";
               $event[$substate] = $match[1];
-          } elseif (preg_match("/^DESCRIPTION:(.+)$/i", $buff, $match)) {
+          } elseif (preg_match("/^DESCRIPTION[^:]*:(.+)$/i", $buff, $match)) {
               $substate = "description";
               $event[$substate] = $match[1];
-          } elseif (preg_match("/^DESCRIPTION.*:(.+)$/i", $buff, $match)) {
-              $substate = "description";
-              $event[$substate] = $match[1];
-          } elseif (preg_match("/^LOCATION.*:(.+)$/i", $buff, $match)) {
+          } elseif (preg_match("/^LOCATION[^:]*:(.+)$/i", $buff, $match)) {
               $substate = "location";
               $event[$substate] = $match[1];
           } elseif (preg_match("/^URL(?:;VALUE=[^:]+)?:(.+)$/i", $buff, $match)) {
               $substate = "url";
               $event[$substate] = $match[1];
-          } elseif (preg_match("/^CLASS.*:(.*)$/i", $buff, $match)) {
+          } elseif (preg_match("/^CLASS[^:]*:(.*)$/i", $buff, $match)) {
               $substate = "class";
               $event[$substate] = $match[1];
-          } elseif (preg_match("/^PRIORITY.*:(.*)$/i", $buff, $match)) {
+          } elseif (preg_match("/^PRIORITY[^:]*:(.*)$/i", $buff, $match)) {
               $substate = "priority";
               $event[$substate] = $match[1];
-	  } elseif (preg_match("/^DTSTART.*:\s*(\d+T\d+Z?)\s*$/i", $buff, $match)) {
+	  } elseif (preg_match("/^DTSTART[^:]*:\s*(\d+T\d+Z?)\s*$/i", $buff, $match)) {
               $substate = "dtstart";
               $event[$substate] = $match[1];
-	  } elseif (preg_match("/^DTSTART.*:\s*(\d+)\s*$/i", $buff, $match)) {
+	  } elseif (preg_match("/^DTSTART[^:]*:\s*(\d+)\s*$/i", $buff, $match)) {
               $substate = "dtstart";
               $event[$substate] = $match[1];
-          } elseif (preg_match("/^DTEND.*:\s*(.*)\s*$/i", $buff, $match)) {
+          } elseif (preg_match("/^DTEND[^:]*:\s*(.*)\s*$/i", $buff, $match)) {
               $substate = "dtend";
               $event[$substate] = $match[1];
-          } elseif (preg_match("/^DURATION.*:(.+)\s*$/i", $buff, $match)) {
+          } elseif (preg_match("/^DURATION[^:]*:(.+)\s*$/i", $buff, $match)) {
               $substate = "duration";
               $durH = $durM = 0;
               if ( preg_match ( "/PT.*([0-9]+)H/", $match[1], $submatch ) )
@@ -116,16 +113,16 @@ function parse_ical ( $cal_file ) {
               if ( preg_match ( "/PT.*([0-9]+)M/", $match[1], $submatch ) )
                 $durM = $submatch[1];
               $event[$substate] = $durH * 60 + $durM;
-          } elseif (preg_match("/^RRULE.*:(.+)$/i", $buff, $match)) {
+          } elseif (preg_match("/^RRULE[^:]*:(.+)$/i", $buff, $match)) {
               $substate = "rrule";
               $event[$substate] = $match[1];
-          } elseif (preg_match("/^EXDATE.*:(.+)$/i", $buff, $match)) {
+          } elseif (preg_match("/^EXDATE[^:]*:(.+)$/i", $buff, $match)) {
               $substate = "exdate";
               $event[$substate] = $match[1];
-          } elseif (preg_match("/^CATEGORIES.*:(.+)$/i", $buff, $match)) {
+          } elseif (preg_match("/^CATEGORIES[^:]*:(.+)$/i", $buff, $match)) {
               $substate = "categories";
               $event[$substate] = $match[1];
-          } elseif (preg_match("/^UID.*:(.+)$/i", $buff, $match)) {
+          } elseif (preg_match("/^UID[^:]*:(.+)$/i", $buff, $match)) {
               $substate = "uid";
               $event[$substate] = $match[1];
           } elseif (preg_match("/^END:VEVENT$/i", $buff, $match)) {

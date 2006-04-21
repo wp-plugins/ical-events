@@ -239,8 +239,18 @@ if (! class_exists('ICalEvents')) {
 		 * start and end times.
 		 */
 		function falls_between($event, $gmt_start, $gmt_end) {
-			return ((! $gmt_start or $event['StartTime'] >= $gmt_start)
-				and (! $gmt_end or $event['EndTime'] <= $gmt_end));
+			$falls_between = false;
+
+			if ($event['Untimed'] or $event['Duration'] == 1440) {
+				// All-day events
+				$falls_between = ($gmt_start <= $event['StartTime'] + 86400);
+			}
+			else {
+				$falls_between = ((! $gmt_start or $event['StartTime'] >= $gmt_start)
+					and (! $gmt_end or $event['EndTime'] <= $gmt_end));
+			}
+
+			return $falls_between;
 		}
 
 		/*

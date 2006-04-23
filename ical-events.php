@@ -34,7 +34,7 @@ if (! class_exists('ICalEvents')) {
 			parse_str($args, $r);
 
 			if (! isset($r['url'])) {
-				echo "iCal Events: No URL specified";
+				echo "iCal Events: No URL specified\n";
 				return;
 			}
 
@@ -107,7 +107,9 @@ if (! class_exists('ICalEvents')) {
 					$output .= $before_location . htmlentities($event['Location']) . $after_location;
 				}
 
-				$output .= '<!-- ' . htmlentities($event['UID']) . ' -->';
+				if ($event['UID']) {
+					$output .= '<!-- ' . htmlentities($event['UID']) . ' -->';
+				}
 				$output .= $after . "\n";
 			}
 
@@ -241,13 +243,15 @@ if (! class_exists('ICalEvents')) {
 		function falls_between($event, $gmt_start, $gmt_end) {
 			$falls_between = false;
 
+			//print "StartTime = {$event['StartTime']}, EndTime = {$event['EndTime']}, gmt_start = [$gmt_start], gmt_end = [$gmt_end]\n";
 			if ($event['Untimed'] or $event['Duration'] == 1440) {
-				// All-day events
-				$falls_between = ($gmt_start <= $event['StartTime'] + 86400);
+				// Keep all-day events for the whole day
+				$falls_between = ((! $gmt_start or $gmt_start <= $event['StartTime'] + 86400)
+					and (! $gmt_end or $gmt_end >= $event['EndTime']));
 			}
 			else {
-				$falls_between = ((! $gmt_start or $event['StartTime'] >= $gmt_start)
-					and (! $gmt_end or $event['EndTime'] <= $gmt_end));
+				$falls_between = ((! $gmt_start or $gmt_start <= $event['StartTime'])
+					and (! $gmt_end or $gmt_end >= $event['EndTime']));
 			}
 
 			return $falls_between;

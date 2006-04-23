@@ -5,11 +5,15 @@ error_reporting(E_ALL);
 require_once($_ENV['HOME'] . '/public_html/wp-config.php');
 require_once('ical-events.php');
 
-if (count($argv) < 2) die($argv[0] . " URL [TIME] [NUMBER]\n");
+if (count($argv) < 2) die($argv[0] . "QUERY_STRING\n");
 
-$url   = $argv[1];
-$time  = (isset($argv[2]) ? $argv[2] : time());
-$limit = (isset($argv[3]) ? $argv[3] : 5);
+$args = array();
+parse_str($argv[1], $args);
 
-ICalEvents::display_events("url=$url&gmt_start=$time&limit=$limit");
+$pairs = array();
+foreach ($args as $key => $value) {
+	$pairs[] = urlencode($key) . '=' . urlencode($value);
+}
+
+ICalEvents::display_events(implode('&', $pairs));
 ?>

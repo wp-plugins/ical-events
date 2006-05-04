@@ -126,8 +126,9 @@ if (! class_exists('ICalEvents')) {
 		 * print_r.
 		 */
 		function get_events($url, $gmt_start = null, $gmt_end = null, $limit = null) {
-			$filename = ICalEvents::cache_url($url);
-			$events = parse_ical($filename);
+			$file = ICalEvents::cache_url($url);
+
+			$events = parse_ical($file);
 			if (! is_array($events) or count($events) <= 0) {
 				echo "iCal Events: Error parsing calendar";
 				return;
@@ -143,11 +144,11 @@ if (! class_exists('ICalEvents')) {
 		 * destination file.
 		 */
 		function cache_url($url) {
-			$filename = ICalEvents::get_cache_path() . ICalEvents::get_cache_filename($url);
+			$file = ICalEvents::get_cache_file($url);
 
-			if (! file_exists($filename) or time() - filemtime($filename) >= ICAL_EVENTS_CACHE_TTL) {
+			if (! file_exists($file) or time() - filemtime($file) >= ICAL_EVENTS_CACHE_TTL) {
 				$src  = fopen($url, 'r') or die("Error opening $url");
-				$dest = fopen($filename, 'w') or die("Error opening $filename");
+				$dest = fopen($file, 'w') or die("Error opening $file");
 
 				while ($data = fread($src, 8192)) {
 					fwrite($dest, $data);
@@ -157,7 +158,14 @@ if (! class_exists('ICalEvents')) {
 				fclose($dest);
 			}
 
-			return $filename;
+			return $file;
+		}
+
+		/*
+		 * Return the full path to the cache file for the specified URL.
+		 */
+		function get_cache_file($url) {
+			return ICalEvents::get_cache_path() . ICalEvents::get_cache_filename($url);
 		}
 
 		/*

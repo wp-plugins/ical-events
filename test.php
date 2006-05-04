@@ -5,15 +5,29 @@ error_reporting(E_ALL);
 require_once($_ENV['HOME'] . '/public_html/wp-config.php');
 require_once('ical-events.php');
 
-if (count($argv) < 2) die($argv[0] . "QUERY_STRING\n");
+if (count($argv) < 2) die("$argv[0] ARGS\n");
 
+// Parse the arguments
+$pairs  = array_splice($argv, 1);
 $args = array();
-parse_str($argv[1], $args);
-
-$pairs = array();
-foreach ($args as $key => $value) {
-	$pairs[] = urlencode($key) . '=' . urlencode($value);
+foreach ($pairs as $pair) {
+	list($key, $value) = split('=', $pair);
+	$args[$key] = $value;
 }
 
-ICalEvents::display_events(implode('&', $pairs));
+// Remove the cached file
+if ($args['url']) {
+	$file = ICalEvents::get_cache_file($args['url']);
+	if (file_exists($file)) {
+		unlink($file);
+	}
+}
+
+// Build a query string
+$encoded = array();
+foreach ($args as $key => $value) {
+	$encoded[] = urlencode($key) . '=' . urlencode($value);
+}
+
+ICalEvents::display_events(implode('&', $encoded));
 ?>

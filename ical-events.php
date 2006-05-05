@@ -305,7 +305,7 @@ if (! class_exists('ICalEvents')) {
 
 				// Start at one to avoid repeating the original
 				$count = 1;
-				while ($count <= $limit and $count <= ICAL_EVENTS_MAX_REPEATS) {
+				while ($count++ <= ICAL_EVENTS_MAX_REPEATS) {
 					if ($repeat_days) {
 						foreach ($repeat_days as $repeat_day) {
 							$repeat = ICalEvents::get_repeat($event, $interval, $count, $repeat_day);
@@ -320,7 +320,8 @@ if (! class_exists('ICalEvents')) {
 					// Don't repeat past the RRULE-defined end time, if one exists
 					if ($rrule['EndTime'] and $event['StartTime'] + $interval * $count <= $rrule['EndTime']) break;
 
-					++$count;
+					// Don't repeat past the user-defined limit, if one exists
+					if ($limit and $count >= $limit) break;
 				}
 			}
 			else {

@@ -12,10 +12,9 @@ require_once('import_ical.php');
 
 define('ICAL_EVENTS_CACHE_TTL', 24 * 60 * 60);  // 1 day
 define('ICAL_EVENTS_CACHE_DEFAULT_EXTENSION', 'ics');
+define('ICAL_EVENTS_MAX_REPEATS', '100');
 
-/*
- * As defined by import_ical.php
- */
+// As defined by import_ical.php
 $ICAL_EVENTS_REPEAT_INTERVALS = array(
 	1 => 24 * 60 * 60,        // Daily
 	2 => 7 * 24 * 60 * 60,    // Weekly
@@ -209,7 +208,7 @@ if (! class_exists('ICalEvents')) {
 		 * events.
 		 */
 		function constrain($events, $gmt_start = null, $gmt_end = null, $limit = null) {
-			$repeats = ICalEvents::collapse_repeats($events, $gmt_start, $gmt_end);
+			$repeats = ICalEvents::collapse_repeats($events, $gmt_start, $gmt_end, $limit);
 			if (is_array($repeats) and count($repeats) > 0) {
 				$events = array_merge($events, $repeats);
 			}
@@ -269,12 +268,12 @@ if (! class_exists('ICalEvents')) {
 		 * Collapse repeating events down to nonrepeating events at the
 		 * corresponding repeat time.
 		 */
-		function collapse_repeats($events) {
+		function collapse_repeats($events, $gmt_start, $gmt_end, $limit) {
 			$repeats = array();
 
 			foreach ($events as $event) {
 				if (isset($event['Repeat'])) {
-					$r = ICalEvents::get_repeats_between($event, $gmt_start, $gmt_end);
+					$r = ICalEvents::get_repeats_between($event, $gmt_start, $gmt_end, $limit);
 					if (is_array($r) and count($r) > 0) {
 						$repeats = array_merge($repeats, $r);
 					}
@@ -291,18 +290,19 @@ if (! class_exists('ICalEvents')) {
 		 * TODO: Only handles some types of repeating events
 		 * TODO: Check for exceptions to the RRULE
 		 */
-		function get_repeats_between($event, $gmt_start, $gmt_end) {
+		function get_repeats_between($event, $gmt_start, $gmt_end, $limit) {
 			global $ICAL_EVENTS_REPEAT_INTERVALS;
 
-			$rr = $event['Repeat'];
+			$rrule = $event['Repeat'];
 
 			$repeats = array();
-			if (isset($ICAL_EVENTS_REPEAT_INTERVALS[$rr['Interval']])) {
-				$interval    = $ICAL_EVENTS_REPEAT_INTERVALS[$rr['Interval']] * ($rr['Frequency'] ? $rr['Frequency'] : 1);
-				$repeat_days = ICalEvents::get_repeat_days($rr['RepeatDays']);
+			if (isset($ICAL_EVENTS_REPEAT_INTERVALS[$rrule['Interval']])) {
+				$interval    = $ICAL_EVENTS_REPEAT_INTERVALS[$rrule['Interval']] * ($rrule['Frequency'] ? $rrule['Frequency'] : 1);
+				$repeat_days = ICalEvents::get_repeat_days($rrule['RepeatDays']);
 
-				$count = 0;
-				while ($event['StartTime'] + $interval * $count <= $rr['EndTime']) {
+				// Start at one to avoid repeating the original
+				$count = 1;
+				while ($count <= $limit and $count <= ICAL_EVENTS_MAX_REPEATS) {
 					if ($repeat_days) {
 						foreach ($repeat_days as $repeat_day) {
 							$repeat = ICalEvents::get_repeat($event, $interval, $count, $repeat_day);
@@ -313,6 +313,9 @@ if (! class_exists('ICalEvents')) {
 						$repeat = ICalEvents::get_simple_repeat($event, $interval, $count);
 						if (ICalEvents::falls_between($repeat, $gmt_start, $gmt_end)) $repeats[] = $repeat;
 					}
+
+					// Don't repeat past the RRULE-defined end time, if one exists
+					if ($rrule['EndTime'] and $event['StartTime'] + $interval * $count <= $rrule['EndTime']) break;
 
 					++$count;
 				}
@@ -364,6 +367,7 @@ if (! class_exists('ICalEvents')) {
 		 */
 		function get_simple_repeat($event, $interval, $count) {
 			$duration = 0;
+
 			if ($event['Duration']) {
 				$duration = $event['Duration'] * 60;
 			}
@@ -375,6 +379,9 @@ if (! class_exists('ICalEvents')) {
 			unset($repeat['Repeat']);
 
 			$repeat['StartTime'] += $interval * $count;
+
+			// Default to no duration
+			$repeat['EndTime'] = $repeat['StartTime'];
 			if ($duration > 0) {
 				$repeat['EndTime'] = $repeat['StartTime'] + $duration;
 			}

@@ -250,7 +250,10 @@ if (! class_exists('ICalEvents')) {
 		function falls_between($event, $gmt_start, $gmt_end) {
 			$falls_between = false;
 
-			//print "StartTime = {$event['StartTime']}, EndTime = {$event['EndTime']}, gmt_start = [$gmt_start], gmt_end = [$gmt_end]\n";
+			if ($_ENV['ICAL_EVENTS_DEBUG']) {
+				print "StartTime = {$event['StartTime']}, EndTime = {$event['EndTime']}, gmt_start = [$gmt_start], gmt_end = [$gmt_end]\n";
+			}
+
 			if ($event['Untimed'] or $event['Duration'] == 1440) {
 				// Keep all-day events for the whole day
 				$falls_between = ((! $gmt_start or $gmt_start <= $event['StartTime'] + 86400)

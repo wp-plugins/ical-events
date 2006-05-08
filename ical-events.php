@@ -303,8 +303,7 @@ if (! class_exists('ICalEvents')) {
 				$interval    = $ICAL_EVENTS_REPEAT_INTERVALS[$rrule['Interval']] * ($rrule['Frequency'] ? $rrule['Frequency'] : 1);
 				$repeat_days = ICalEvents::get_repeat_days($rrule['RepeatDays']);
 
-				// Start at one to avoid repeating the original
-				$count = 1;
+				$count = 0;
 				while ($count++ <= ICAL_EVENTS_MAX_REPEATS) {
 					if ($repeat_days) {
 						foreach ($repeat_days as $repeat_day) {
@@ -318,7 +317,7 @@ if (! class_exists('ICalEvents')) {
 					}
 
 					// Don't repeat past the RRULE-defined end time, if one exists
-					if ($rrule['EndTime'] and $event['StartTime'] + $interval * $count <= $rrule['EndTime']) break;
+					if ($rrule['EndTime'] and $event['StartTime'] + $interval * $count >= $rrule['EndTime']) break;
 
 					// Don't repeat past the user-defined limit, if one exists
 					if ($limit and $count >= $limit) break;

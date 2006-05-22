@@ -107,13 +107,12 @@ function parse_ical ( $cal_file ) {
               $event[$substate] = $match[1];
           } elseif (preg_match("/^DURATION[^:]*:(.+)\s*$/i", $buff, $match)) {
               $substate = "duration";
-              $durH = $durM - $durS = 0;
-              if ( preg_match ( "/PT([0-9]+)H/", $match[1], $submatch ) )
-                $durH = $submatch[1];
-              if ( preg_match ( "/PT([0-9]+)M/", $match[1], $submatch ) )
-                $durM = $submatch[1];
-              if ( preg_match ( "/PT([0-9]+)S/", $match[1], $submatch ) )
-                $durS = $submatch[1];
+              $durH = $durM = $durS = 0;
+              if ( preg_match ( "/PT(?:([0-9]+)H)?(?:([0-9]+)M)?(?:([0-9]+)S)?/", $match[1], $submatch ) ) {
+                  $durH = $submatch[1];
+                  $durM = $submatch[2];
+                  $durS = $submatch[3];
+	      }
               $event[$substate] = $durH * 60 + $durM + $durS / 60;
           } elseif (preg_match("/^RRULE[^:]*:(.+)$/i", $buff, $match)) {
               $substate = "rrule";

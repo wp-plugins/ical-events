@@ -13,6 +13,7 @@ require_once('import_ical.php');
 define('ICAL_EVENTS_CACHE_TTL', 24 * 60 * 60);  // 1 day
 define('ICAL_EVENTS_CACHE_DEFAULT_EXTENSION', 'ics');
 define('ICAL_EVENTS_MAX_REPEATS', '100');
+if (! defined('ICAL_EVENTS_DEBUG')) define('ICAL_EVENTS_DEBUG', false);
 
 // As defined by import_ical.php
 $ICAL_EVENTS_REPEAT_INTERVALS = array(
@@ -250,7 +251,7 @@ if (! class_exists('ICalEvents')) {
 		function falls_between($event, $gmt_start, $gmt_end) {
 			$falls_between = false;
 
-			if ($_ENV['ICAL_EVENTS_DEBUG']) {
+			if (ICAL_EVENTS_DEBUG) {
 				print "StartTime = {$event['StartTime']}, EndTime = {$event['EndTime']}, gmt_start = [$gmt_start], gmt_end = [$gmt_end]\n";
 			}
 

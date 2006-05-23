@@ -1,8 +1,7 @@
 #!/usr/bin/env php
 <?php
 error_reporting(E_ALL);
-
-$_ENV['ICAL_EVENTS_DEBUG'] = true;
+define('ICAL_EVENTS_DEBUG', true);
 
 require_once($_ENV['HOME'] . '/public_html/wp-config.php');
 require_once('ical-events.php');

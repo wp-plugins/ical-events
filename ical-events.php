@@ -404,20 +404,25 @@ if (! class_exists('ICalEvents')) {
 		function format_date_range($gmt_start, $gmt_end, $date_format, $time_format, $separator = ' - ') {
 			$output = '';
 
+			if (! $date_format) return $output;
+
+			$same_day_format = $time_format ? $time_format : $date_format;
+			$normal_format   = $time_format ? "$date_format $time_format" : $date_format;
+
 			if (ICalEvents::is_today($gmt_start)) {
-				$output .= strftime($time_format, $gmt_start);
+				$output .= strftime($same_day_format, $gmt_start);
 			}
 			else {
-				$output .= strftime("$date_format $time_format", $gmt_start);
+				$output .= strftime($normal_format, $gmt_start);
 			}
 
 			if ($gmt_start != $gmt_end) {
 				$output .= $separator;
 				if (ICalEvents::is_today($gmt_end) or ICalEvents::is_same_day($gmt_start, $gmt_end)) {
-					$output .= strftime($time_format, $gmt_end);
+					$output .= strftime($same_day_format, $gmt_end);
 				}
 				else {
-					$output .= strftime("$date_format $time_format", $gmt_end);
+					$output .= strftime($normal_format, $gmt_end);
 				}
 			}
 

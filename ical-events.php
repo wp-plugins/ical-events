@@ -79,7 +79,7 @@ if (! class_exists('ICalEvents')) {
 					$output .= htmlentities(strftime($date_format, $event['StartTime']));
 				}
 				else {
-					$output .= htmlentities(ICalEvents::format_date_range($event['StartTime'], $event['EndTime'], $date_format, $time_format));
+					$output .= htmlentities(ICalEvents::format_date_range($event['StartTime'], $event['EndTime'], $event['Untimed'], $date_format, $time_format));
 				}
 				$output .= $after_date;
 
@@ -401,34 +401,36 @@ if (! class_exists('ICalEvents')) {
 		/*
 		 * Return a string representing the specified date range.
 		 */
-		function format_date_range($gmt_start, $gmt_end, $date_format, $time_format, $separator = ' - ') {
+		function format_date_range($gmt_start, $gmt_end, $untimed, $date_format, $time_format, $separator = ' - ') {
 			$output = '';
 
-			if (! $date_format) return $output;
-
-			$same_day_format = $time_format ? $time_format : $date_format;
-			$normal_format   = $time_format ? "$date_format $time_format" : $date_format;
-
-			if (ICalEvents::is_today($gmt_start)) {
-				$output .= strftime($same_day_format, $gmt_start);
-			}
-			else {
-				$output .= strftime($normal_format, $gmt_start);
-			}
+			$output .= ICalEvents::format_date_range_part($gmt_start, $untimed, ICalEvents::is_today($gmt_start), $date_format, $time_format);
 
 			if ($gmt_start != $gmt_end) {
 				$output .= $separator;
-				if (ICalEvents::is_today($gmt_end) or ICalEvents::is_same_day($gmt_start, $gmt_end)) {
-					$output .= strftime($same_day_format, $gmt_end);
-				}
-				else {
-					$output .= strftime($normal_format, $gmt_end);
-				}
+				$output .= ICalEvents::format_date_range_part($gmt_end, $untimed, ICalEvents::is_same_day($gmt_start, $gmt_end), $date_format, $time_format);
 			}
 
 			$output = trim(preg_replace('/\s{2,}/', ' ', $output));
 
 			return $output;
+		}
+
+		/*
+		 * Return a string representing the specified date.
+		 */
+		function format_date_range_part($gmt, $untimed, $only_use_time, $date_format, $time_format) {
+			$default_format = "$date_format $time_format";
+
+			$format = $default_format;
+			if ($untimed) {
+				$format = $date_format;
+			}
+			else if ($only_use_time) {
+				$format = $time_format;
+			}
+
+			return strftime($format, $gmt);
 		}
 
 		/*

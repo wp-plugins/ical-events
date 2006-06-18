@@ -252,7 +252,7 @@ if (! class_exists('ICalEvents')) {
 			$falls_between = false;
 
 			if (ICAL_EVENTS_DEBUG) {
-				print "UID = [{$event['UID']}], StartTime = [{$event['StartTime']}], EndTime = [{$event['EndTime']}], Untimed = [{$event['Untimed']}], gmt_start = [$gmt_start], gmt_end = [$gmt_end]\n";
+				print "UID = [{$event['UID']}], StartTime = [{$event['StartTime']}], EndTime = [{$event['EndTime']}], Untimed = [{$event['Untimed']}], Duration = [{$event['Duration']}], gmt_start = [$gmt_start], gmt_end = [$gmt_end]\n";
 			}
 
 			if ($event['Untimed'] or $event['Duration'] == 1440) {

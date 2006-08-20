@@ -70,3 +70,7 @@ There are many iCal sources, such as:
 * <a href="http://www.apple.com/ical/library/">Apple's iCal library</a>
 * <a href="http://www.icalshare.com/">iCalShare</a>
 * <a href="http://calendar.google.com/">Google Calendar</a>
+
+= My server does not support `fopen` on URLs. Can I still use this plugin? =
+
+As of version 1.8, this plugin supports usage of cURL via the `url-cache` plugin. If your server does not support `fopen` on URLs, install the `url-cache` plugin and `ical-events` will automatically use cURL instead of `fopen`.

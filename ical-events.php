@@ -69,6 +69,7 @@ if (! class_exists('ICalEvents')) {
 		 */
 		function do_display_events($url, $gmt_start, $gmt_end, $limit, $date_format, $time_format, $before, $after, $before_date, $after_date, $use_summary, $before_summary, $after_summary, $use_description, $before_description, $after_description, $replace_newlines_with, $use_location, $before_location, $after_location, $use_url, $echo) {
 			$events = ICalEvents::get_events($url, $gmt_start, $gmt_end, $limit);
+			if (! $events) return;
 
 			$output = '';
 			foreach ($events as $event) {
@@ -150,13 +151,18 @@ if (! class_exists('ICalEvents')) {
 		function cache_url($url) {
 			$file = null;
 
+			$ttl = ICAL_EVENTS_CACHE_TTL;
 			if (function_exists('url_cache')) {
-				url_cache($url, '', '', ICAL_EVENTS_CACHE_TTL);
+				// url_cache returns a (local) URL, which would still require allow_url_fopen...
+				url_cache($url, '', '', $ttl);
+				if (uc_is_cached($url, $ttl)) {
+					$file = uc_get_local_file($url);
+				}
 			}
 			else {
 				$file = ICalEvents::get_cache_file($url);
 
-				if (! file_exists($file) or time() - filemtime($file) >= ICAL_EVENTS_CACHE_TTL) {
+				if (! file_exists($file) or time() - filemtime($file) >= $ttl) {
 					$src  = fopen($url, 'r') or die("Error opening $url");
 					$dest = fopen($file, 'w') or die("Error opening $file");
 

@@ -127,10 +127,14 @@ if (! class_exists('ICalEvents')) {
 		 */
 		function get_events($url, $gmt_start = null, $gmt_end = null, $limit = null) {
 			$file = ICalEvents::cache_url($url);
+			if (! $file) {
+				echo "iCal Events: Error loading [$url]";
+				return;
+			}
 
 			$events = parse_ical($file);
 			if (! is_array($events) or count($events) <= 0) {
-				echo "iCal Events: Error parsing calendar";
+				echo "iCal Events: Error parsing calendar [$url]";
 				return;
 			}
 
@@ -144,18 +148,25 @@ if (! class_exists('ICalEvents')) {
 		 * destination file.
 		 */
 		function cache_url($url) {
-			$file = ICalEvents::get_cache_file($url);
+			$file = null;
 
-			if (! file_exists($file) or time() - filemtime($file) >= ICAL_EVENTS_CACHE_TTL) {
-				$src  = fopen($url, 'r') or die("Error opening $url");
-				$dest = fopen($file, 'w') or die("Error opening $file");
+			if (function_exists('url_cache')) {
+				url_cache($url, '', '', ICAL_EVENTS_CACHE_TTL);
+			}
+			else {
+				$file = ICalEvents::get_cache_file($url);
 
-				while ($data = fread($src, 8192)) {
-					fwrite($dest, $data);
+				if (! file_exists($file) or time() - filemtime($file) >= ICAL_EVENTS_CACHE_TTL) {
+					$src  = fopen($url, 'r') or die("Error opening $url");
+					$dest = fopen($file, 'w') or die("Error opening $file");
+
+					while ($data = fread($src, 8192)) {
+						fwrite($dest, $data);
+					}
+
+					fclose($src);
+					fclose($dest);
 				}
-
-				fclose($src);
-				fclose($dest);
 			}
 
 			return $file;

@@ -73,4 +73,4 @@ There are many iCal sources, such as:
 
 = My server does not support `fopen` on URLs. Can I still use this plugin? =
 
-As of version 1.8, this plugin supports usage of cURL via the `url-cache` plugin. If your server does not support `fopen` on URLs, install the `url-cache` plugin and `ical-events` will automatically use cURL instead of `fopen`.
+As of version 1.8, this plugin supports usage of cURL via the <a href="http://mcnicks.org/software/wordpress/url-cache/">`url-cache` plugin</a>. If your server does not support `fopen` on URLs, install the `url-cache` plugin and `ical-events` will automatically use cURL instead of `fopen`.

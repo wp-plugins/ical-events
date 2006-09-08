@@ -274,12 +274,12 @@ if (! class_exists('ICalEvents')) {
 
 			if ($event['Untimed'] or $event['Duration'] == 1440) {
 				// Keep all-day events for the whole day
-				$falls_between = ((! $gmt_start or $event['EndTime'] + 86400 > $gmt_start)
-					and (! $gmt_end or $event['StartTime'] < $gmt_end));
+				$falls_between = ((! $gmt_start or $event['StartTime'] + 86400 > $gmt_start)
+					and (! $gmt_end or $event['EndTime'] < $gmt_end));
 			}
 			else {
-				$falls_between = ((! $gmt_start or $event['EndTime'] > $gmt_start)
-					and (! $gmt_end or $event['StartTime'] < $gmt_end));
+				$falls_between = ((! $gmt_start or $event['StartTime'] > $gmt_start)
+					and (! $gmt_end or $event['EndTime'] < $gmt_end));
 			}
 
 			return $falls_between;

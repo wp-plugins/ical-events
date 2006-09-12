@@ -149,30 +149,15 @@ if (! class_exists('ICalEvents')) {
 		 * destination file.
 		 */
 		function cache_url($url) {
-			$file = null;
+			$file = ICalEvents::get_cache_file($url);
 
-			$ttl = ICAL_EVENTS_CACHE_TTL;
-			if (function_exists('url_cache')) {
-				// url_cache returns a (local) URL, which would still require allow_url_fopen...
-				url_cache($url, '', '', $ttl);
-				if (uc_is_cached($url, $ttl)) {
-					$file = uc_get_local_file($url);
-				}
-			}
-			else {
-				$file = ICalEvents::get_cache_file($url);
+			if (! file_exists($file) or time() - filemtime($file) >= ICAL_EVENTS_CACHE_TTL) {
+				$data = wp_remote_fopen($url);
+				if ($data === false) die("iCal Events: Could not fetch [$url]");
 
-				if (! file_exists($file) or time() - filemtime($file) >= $ttl) {
-					$src  = fopen($url, 'r') or die("Error opening $url");
-					$dest = fopen($file, 'w') or die("Error opening $file");
-
-					while ($data = fread($src, 8192)) {
-						fwrite($dest, $data);
-					}
-
-					fclose($src);
-					fclose($dest);
-				}
+				$dest = fopen($file, 'w') or die("Error opening $file");
+				fwrite($dest, $data);
+				fclose($dest);
 			}
 
 			return $file;

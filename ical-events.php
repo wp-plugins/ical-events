@@ -307,16 +307,22 @@ if (! class_exists('ICalEvents')) {
 				$repeat_days = ICalEvents::get_repeat_days($rrule['RepeatDays']);
 
 				$count = 0;
-				while ($count++ <= ICAL_EVENTS_MAX_REPEATS) {
+				while ($count <= ICAL_EVENTS_MAX_REPEATS) {
 					if ($repeat_days) {
 						foreach ($repeat_days as $repeat_day) {
 							$repeat = ICalEvents::get_repeat($event, $interval, $count, $repeat_day);
-							if (ICalEvents::falls_between($repeat, $gmt_start, $gmt_end)) $repeats[] = $repeat;
+							if (! ICalEvents::is_duplicate($repeat, $event)
+							    and ICalEvents::falls_between($repeat, $gmt_start, $gmt_end)) {
+								$repeats[] = $repeat;
+							}
 						}
 					}
 					else {
 						$repeat = ICalEvents::get_simple_repeat($event, $interval, $count);
-						if (ICalEvents::falls_between($repeat, $gmt_start, $gmt_end)) $repeats[] = $repeat;
+						if (! ICalEvents::is_duplicate($repeat, $event)
+						    and ICalEvents::falls_between($repeat, $gmt_start, $gmt_end)) {
+							$repeats[] = $repeat;
+						}
 					}
 
 					// Don't repeat past the RRULE-defined end time, if one exists
@@ -324,6 +330,8 @@ if (! class_exists('ICalEvents')) {
 
 					// Don't repeat past the user-defined limit, if one exists
 					if ($limit and $count >= $limit) break;
+
+					++$count;
 				}
 			}
 			else {
@@ -398,6 +406,14 @@ if (! class_exists('ICalEvents')) {
 			$repeat['EndTime'] += $offset;
 
 			return $repeat;
+		}
+
+		/*
+		 * Return true if the start and end times are the same.
+		 */
+		function is_duplicate($event1, $event2) {
+			return ($event1['StartTime'] == $event2['StartTime']
+				and $event1['EndTime'] == $event2['EndTime']);
 		}
 
 		/*

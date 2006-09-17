@@ -123,6 +123,12 @@ function parse_ical ( $cal_file ) {
           } elseif (preg_match("/^CATEGORIES[^:]*:(.+)$/i", $buff, $match)) {
               $substate = "categories";
               $event[$substate] = $match[1];
+          } elseif (preg_match("/^STATUS[^:]*:(.+)$/i", $buff, $match)) {
+              $substate = "status";
+              $event[$substate] = $match[1];
+          } elseif (preg_match("/^RECURRENCE-ID[^:]*:\s*(.*)\s*$/i", $buff, $match)) {
+              $substate = "recurrence-id";
+              $event[$substate] = $match[1];
           } elseif (preg_match("/^UID[^:]*:(.+)$/i", $buff, $match)) {
               $substate = "uid";
               $event[$substate] = $match[1];
@@ -236,6 +242,11 @@ function format_ical($event) {
   $fevent['URL'] = format_ical_text($event['url']);
   $fevent['Private'] = preg_match("/private|confidential/i", $event['class']) ? '1' : '0';
   $fevent['UID'] = $event['uid'];
+
+  $fevent['Status'] = format_ical_text($event['status']);
+  if ( isset( $event['recurrence-id'] ) ) {
+    $fevent['RecurrenceID'] = icaldate_to_timestamp($event['recurrence-id']);
+  }
 
   // Repeats
   //

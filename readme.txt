@@ -21,11 +21,11 @@ This example displays three events from the University of Florida calendar, from
 = How can I control the output of this plugin? =
 
 The `display_events` function takes the following arguments:
-* `url`: The URL of the iCal file.
+* `url`: The URL of the iCalendar file.
 * `gmt_start` (optional): Only events from this time forward are displayed. If not specified, the earliest events are displayed.
 * `gmt_end` (optional): Only events before this time are displayed.
 * `limit` (optional): The maximum number of events to display.
-* `date_format` (optional): The format string used to format dates` (see <a href="http://php.net/strftime">strftime documentation</a>). Default: `%a %b %e`.
+* `date_format` (optional): The format string used to format dates (see <a href="http://php.net/strftime">strftime documentation</a>). Default: `%a %b %e`.
 * `time_format` (optional): The format string used to format times. Default: `%l:%M %p`.
 * `before` (optional): HTML or text to display before each event. Default: `<li>`.
 * `after` (optional): HTML or text to display after each event. Default: `</li>`.
@@ -39,7 +39,7 @@ The `display_events` function takes the following arguments:
 * `after_description` (optional): HTML or text to display after each event's description. Default: Empty string.
 * `replace_newlines_with` (optional): String with which to replace newlines in the description. Default: `<br />`.
 * `use_location` (optional): Whether or not to use the event location in the output. If false, only the summary is used. Default: `true`.
-* `before_location` (optional): HTML or text to display before each event's location. Default: `` (`.
+* `before_location` (optional): HTML or text to display before each event's location. Default: ` (`.
 * `after_location` (optional): HTML or text to display after each event's location. Default: `)`.
 * `use_url` (optional): Whether or not to use the event URL in the output. If true, the event URL is made into a link around the event summary. Default: `true`.
 * `echo` (optional): Whether or not to directly display the events. Default: `true`.
@@ -49,7 +49,7 @@ For example, if you want to hide the description and location, you could use som
 `<?php ICalEvents::display_events('url=http://www.ufl.edu/calendar/ufCalendar.ics&limit=3&use_description=0&use_location=0&gmt_start=' . time()); ?>`
 
 If you need more control over the output, use the `get_events` function, which takes the following arguments:
-* `url: The URL of the iCal file.
+* `url`: The URL of the iCalendar file.
 * `gmt_start` (optional): Only events from this time forward are displayed. If not specified, the earliest events are displayed.
 * `gmt_end` (optional): Only events before this time are displayed.
 * `limit` (optional): The maximum number of events to display.
@@ -58,15 +58,15 @@ The function returns an array of events, as parsed by `import_ical.php`. For exa
 
 = How often is the calendar checked for new events? =
 
-Once a day. You can change this using the ICAL_EVENTS_CACHE_LIFETIME near the top of the plugin.
+Once a day. You can change this using the `ICAL_EVENTS_CACHE_LIFETIME` near the top of the plugin.
 
 = Does the plugin support repeating events? =
 
 This plugin makes an attempt to support repeating events. However, not all recurrence rules are implemented in the parser. There may also be bugs in how the plugin interprets the parsed data.
 
-= Where can I find iCal files? =
+= Where can I find iCalendar files? =
 
-There are many iCal sources, such as:
+There are many iCalendar sources, such as:
 * <a href="http://www.apple.com/ical/library/">Apple's iCal library</a>
 * <a href="http://www.icalshare.com/">iCalShare</a>
 * <a href="http://calendar.google.com/">Google Calendar</a>

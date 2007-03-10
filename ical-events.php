@@ -306,6 +306,7 @@ if (! class_exists('ICalEvents')) {
 				$interval    = $ICAL_EVENTS_REPEAT_INTERVALS[$rrule['Interval']] * ($rrule['Frequency'] ? $rrule['Frequency'] : 1);
 				$repeat_days = ICalEvents::get_repeat_days($rrule['RepeatDays']);
 
+				$repeat = null;
 				$count = 0;
 				while ($count <= ICAL_EVENTS_MAX_REPEATS) {
 					if ($repeat_days) {
@@ -315,6 +316,8 @@ if (! class_exists('ICalEvents')) {
 							    and ICalEvents::falls_between($repeat, $gmt_start, $gmt_end)) {
 								$repeats[] = $repeat;
 							}
+
+							if (ICalEvents::after_rrule_end_time($repeat, $rrule)) break;
 						}
 					}
 					else {
@@ -325,8 +328,7 @@ if (! class_exists('ICalEvents')) {
 						}
 					}
 
-					// Don't repeat past the RRULE-defined end time, if one exists
-					if ($rrule['EndTime'] and $event['StartTime'] + $interval * $count >= $rrule['EndTime']) break;
+					if (ICalEvents::after_rrule_end_time($repeat, $rrule)) break;
 
 					// Don't repeat past the user-defined limit, if one exists
 					if ($limit and $count >= $limit) break;
@@ -406,6 +408,17 @@ if (! class_exists('ICalEvents')) {
 			$repeat['EndTime'] += $offset;
 
 			return $repeat;
+		}
+
+		/*
+		 * Return true if the specified event is passed the
+		 * RRULE's end time.  If an end time isn't specified,
+		 * return false.
+		 */
+		function after_rrule_end_time($repeat, $rrule) {
+			return ($repeat and $rrule
+				and $repeat['StartTime'] and $rrule['EndTime']
+				and $repeat['StartTime'] >= $rrule['EndTime']);
 		}
 
 		/*

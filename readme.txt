@@ -1,10 +1,17 @@
 === iCal Events ===
-Tags: calendar, events
 Contributors: dwc
+Tags: calendar, events
+Requires at least: 2.0
+Tested up to: 2.2
+Stable tag: trunk
 
-A plugin for getting and displaying upcoming events from a shared calendar.
+Display upcoming events from a shared calendar.
 
-This plugin uses <a href="http://cvs.sourceforge.net/viewcvs.py/webcalendar/webcalendar/import_ical.php?rev=HEAD">import_ical.php</a> from the <a href="http://sourceforge.net/projects/webcalendar/">WebCalendar</a> project. A slightly modified version of their parser is provided with this plugin.
+== Description ==
+
+Fetch and display events from an iCalendar (`.ics`) URL in your blog.
+
+This plugin uses [import_ical.php](http://cvs.sourceforge.net/viewcvs.py/webcalendar/webcalendar/import_ical.php?rev=HEAD) from the [WebCalendar](http://sourceforge.net/projects/webcalendar/) project. A slightly modified version of their parser is provided with this plugin.
 
 == Installation ==
 
@@ -21,23 +28,24 @@ This example displays three events from the University of Florida calendar, from
 = How can I control the output of this plugin? =
 
 The `display_events` function takes the following arguments:
+
 * `url`: The URL of the iCalendar file.
 * `gmt_start` (optional): Only events from this time forward are displayed. If not specified, the earliest events are displayed.
 * `gmt_end` (optional): Only events before this time are displayed.
 * `limit` (optional): The maximum number of events to display.
-* `date_format` (optional): The format string used to format dates (see <a href="http://php.net/strftime">strftime documentation</a>). Default: `%a %b %e`.
+* `date_format` (optional): The format string used to format dates (see [strftime documentation](http://php.net/strftime)). Default: `%a %b %e`.
 * `time_format` (optional): The format string used to format times. Default: `%l:%M %p`.
-* `before` (optional): HTML or text to display before each event. Default: `<li>`.
-* `after` (optional): HTML or text to display after each event. Default: `</li>`.
-* `before_date` (optional): HTML or text to display before each event's date. Default: `<strong>`.
-* `after_date` (optional): HTML or text to display after each event's date. Default: `</strong>: `.
+* `before` (optional): HTML or text to display before each event. Default: HTML `li` start tag.
+* `after` (optional): HTML or text to display after each event. Default: HTML `li` end tag.
+* `before_date` (optional): HTML or text to display before each event's date. Default: HTML `strong` start tag.
+* `after_date` (optional): HTML or text to display after each event's date. Default: HTML `strong` end tag followed by `: ` (colon and space).
 * `use_summary` (optional): Whether or not to use the event summary in the output. Default: `true`.
 * `before_summary` (optional): HTML or text to display before each event's summary. Default: Empty string.
 * `after_summary` (optional): HTML or text to display after each event's summary. Default: Empty string.
 * `use_description` (optional): Whether or not to use the event description in the output. Default: `true`.
 * `before_description` (optional): HTML or text to display before each event's description. Default: ` - `.
 * `after_description` (optional): HTML or text to display after each event's description. Default: Empty string.
-* `replace_newlines_with` (optional): String with which to replace newlines in the description. Default: `<br />`.
+* `replace_newlines_with` (optional): String with which to replace newlines in the description. Default: HTML `br` tag.
 * `use_location` (optional): Whether or not to use the event location in the output. If false, only the summary is used. Default: `true`.
 * `before_location` (optional): HTML or text to display before each event's location. Default: ` (`.
 * `after_location` (optional): HTML or text to display after each event's location. Default: `)`.
@@ -49,6 +57,7 @@ For example, if you want to hide the description and location, you could use som
 `<?php ICalEvents::display_events('url=http://www.ufl.edu/calendar/ufCalendar.ics&limit=3&use_description=0&use_location=0&gmt_start=' . time()); ?>`
 
 If you need more control over the output, use the `get_events` function, which takes the following arguments:
+
 * `url`: The URL of the iCalendar file.
 * `gmt_start` (optional): Only events from this time forward are displayed. If not specified, the earliest events are displayed.
 * `gmt_end` (optional): Only events before this time are displayed.
@@ -67,9 +76,10 @@ This plugin makes an attempt to support repeating events. However, not all recur
 = Where can I find iCalendar files? =
 
 There are many iCalendar sources, such as:
-* <a href="http://www.apple.com/ical/library/">Apple's iCal library</a>
-* <a href="http://www.icalshare.com/">iCalShare</a>
-* <a href="http://calendar.google.com/">Google Calendar</a>
+
+* [Apple's iCal library](http://www.apple.com/ical/library/)
+* [iCalShare](http://www.icalshare.com/)
+* [Google Calendar](http://calendar.google.com/)
 
 = My server does not support `fopen` on URLs. Can I still use this plugin? =
 

@@ -67,7 +67,11 @@ The function returns an array of events, as parsed by `import_ical.php`. For exa
 
 = How often is the calendar checked for new events? =
 
-Once a day. You can change this using the `ICAL_EVENTS_CACHE_TTL` (time to live) near the top of the plugin.
+Once a day. You can change this using the `ICAL_EVENTS_CACHE_TTL` (time to live) near the top of the plugin to the desired number of seconds in between checks. For example, to load events every hour, use the following:
+
+`define('ICAL_EVENTS_CACHE_TTL', 3600);`
+
+Loading calendars too frequently can get your server banned, so use your best judgment when setting this value.
 
 = Does the plugin support repeating events? =
 

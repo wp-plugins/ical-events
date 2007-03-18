@@ -3,7 +3,7 @@ Contributors: dwc
 Tags: calendar, events
 Requires at least: 2.0
 Tested up to: 2.2
-Stable tag: 1.10
+Stable tag: 1.11
 
 Display upcoming events from a shared calendar.
 
@@ -67,7 +67,7 @@ The function returns an array of events, as parsed by `import_ical.php`. For exa
 
 = How often is the calendar checked for new events? =
 
-Once a day. You can change this using the `ICAL_EVENTS_CACHE_LIFETIME` near the top of the plugin.
+Once a day. You can change this using the `ICAL_EVENTS_CACHE_TTL` (time to live) near the top of the plugin.
 
 = Does the plugin support repeating events? =
 

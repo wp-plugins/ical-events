@@ -3,7 +3,7 @@ Contributors: dwc
 Tags: calendar, events
 Requires at least: 2.0
 Tested up to: 2.2
-Stable tag: 1.11
+Stable tag: 1.12
 
 Display upcoming events from a shared calendar.
 
@@ -73,9 +73,19 @@ Once a day. You can change this using the `ICAL_EVENTS_CACHE_TTL` (time to live)
 
 Loading calendars too frequently can get your server banned, so use your best judgment when setting this value.
 
-= Does the plugin support repeating events? =
+= Why aren't my events showing up correctly? =
 
-This plugin makes an attempt to support repeating events. However, not all recurrence rules are implemented in the parser. There may also be bugs in how the plugin interprets the parsed data.
+This plugin makes an attempt to support as many event definitions that follow the iCalendar specification (RFC 2445) as possible. However, not all recurrence rules are implemented in the parser. There may also be bugs in how the plugin interprets the parsed data.
+
+If an event is showing up correctly in your calendar application (iCal, Google Calendar) but not on your blog, try turning on debugging:
+
+`define('ICAL_EVENTS_DEBUG', true);`
+
+Put that line above the line in the plugin that reads:
+
+`if (! defined('ICAL_EVENTS_DEBUG')) define('ICAL_EVENTS_DEBUG', false);`
+
+Now reload your blog.  You may see various lines about unsupported iCal values; if this is the case, and you're interested in getting it fixed, take a look at the `import_ical.php` file.
 
 = Where can I find iCalendar files? =
 

@@ -277,7 +277,7 @@ function format_ical($event) {
           $fevent['Repeat']['Interval'] = 1;
         } else {
           // not supported :-(
-          echo "Unsupported iCal FREQ value \"$match[1]\"<br />\n";
+          if (ICAL_EVENTS_DEBUG) echo "Unsupported iCal FREQ value \"$match[1]\"<br />\n";
         }
       } else if ( preg_match ( "/^INTERVAL=(.+)$/i", $RR[$i], $match ) ) {
         $fevent['Repeat']['Frequency'] = $match[1];
@@ -286,16 +286,16 @@ function format_ical($event) {
         $fevent['Repeat']['EndTime'] = icaldate_to_timestamp ( $match[1] );
       } else if ( preg_match ( "/^COUNT=(.+)$/i", $RR[$i], $match ) ) {
         // NOT YET SUPPORTED -- TODO
-        echo "Unsupported iCal COUNT value \"$RR[$i]\"<br />\n";
+        if (ICAL_EVENTS_DEBUG) echo "Unsupported iCal COUNT value \"$RR[$i]\"<br />\n";
       } else if ( preg_match ( "/^BYSECOND=(.+)$/i", $RR[$i], $match ) ) {
         // NOT YET SUPPORTED -- TODO
-        echo "Unsupported iCal BYSECOND value \"$RR[$i]\"<br />\n";
+        if (ICAL_EVENTS_DEBUG) echo "Unsupported iCal BYSECOND value \"$RR[$i]\"<br />\n";
       } else if ( preg_match ( "/^BYMINUTE=(.+)$/i", $RR[$i], $match ) ) {
         // NOT YET SUPPORTED -- TODO
-        echo "Unsupported iCal BYMINUTE value \"$RR[$i]\"<br />\n";
+        if (ICAL_EVENTS_DEBUG) echo "Unsupported iCal BYMINUTE value \"$RR[$i]\"<br />\n";
       } else if ( preg_match ( "/^BYHOUR=(.+)$/i", $RR[$i], $match ) ) {
         // NOT YET SUPPORTED -- TODO
-        echo "Unsupported iCal BYHOUR value \"$RR[$i]\"<br />\n";
+        if (ICAL_EVENTS_DEBUG) echo "Unsupported iCal BYHOUR value \"$RR[$i]\"<br />\n";
       } else if ( preg_match ( "/^BYMONTH=(.+)$/i", $RR[$i], $match ) ) {
         // this event repeats during the specified months
         $months = explode ( ",", $match[1] );
@@ -316,16 +316,16 @@ function format_ical($event) {
           }
         } else {
           // WebCalendar does not support this
-          echo "Unsupported iCal BYMONTH value \"$match[1]\"<br />\n";
+          if (ICAL_EVENTS_DEBUG) echo "Unsupported iCal BYMONTH value \"$match[1]\"<br />\n";
         }
       } else if ( preg_match ( "/^BYDAY=(.+)$/i", $RR[$i], $match ) ) {
         $fevent['Repeat']['RepeatDays'] = rrule_repeat_days( explode(',', $match[1]) );
       } else if ( preg_match ( "/^BYMONTHDAY=(.+)$/i", $RR[$i], $match ) ) {
         // NOT YET SUPPORTED -- TODO
-        echo "Unsupported iCal BYMONTHDAY value \"$RR[$i]\"<br />\n";
+        if (ICAL_EVENTS_DEBUG) echo "Unsupported iCal BYMONTHDAY value \"$RR[$i]\"<br />\n";
       } else if ( preg_match ( "/^BYSETPOS=(.+)$/i", $RR[$i], $match ) ) {
         // NOT YET SUPPORTED -- TODO
-        echo "Unsupported iCal BYSETPOS value \"$RR[$i]\"<br />\n";
+        if (ICAL_EVENTS_DEBUG) echo "Unsupported iCal BYSETPOS value \"$RR[$i]\"<br />\n";
       }
     }
 

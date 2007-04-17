@@ -151,7 +151,9 @@ if (! class_exists('ICalEvents')) {
 		function cache_url($url) {
 			$file = ICalEvents::get_cache_file($url);
 
-			if (! file_exists($file) or time() - filemtime($file) >= ICAL_EVENTS_CACHE_TTL) {
+			if (! file_exists($file)
+			    or time() - filemtime($file) >= ICAL_EVENTS_CACHE_TTL
+			    or (current_user_can('activate_plugins') and (bool) $_GET['ical_events_reload'])) {
 				$data = wp_remote_fopen($url);
 				if ($data === false) die("iCal Events: Could not fetch [$url]");
 

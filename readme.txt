@@ -98,3 +98,9 @@ There are many iCalendar sources, such as:
 = My server does not support `fopen` on URLs. Can I still use this plugin? =
 
 As of version 1.9, this plugin supports usage of cURL via WordPress' `wp_remote_fopen` function. Previous versions required the `url-cache` plugin for cURL support, but this is no longer the case.
+
+= The calendar I loaded is broken or didn't load completely; what can I do? =
+
+If you are an administrator of your WordPress site, you can force the plugin to reload it. Just add `?ical_events_reload=1` to the end of the URL (or `&ical_events_reload=1` if the URL already contains a question mark).
+
+Note: Your user account must have the `activate_plugins` role for this to work.

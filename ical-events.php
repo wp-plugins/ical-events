@@ -58,16 +58,17 @@ if (! class_exists('ICalEvents')) {
 			if (! isset($r['before_location'])) $r['before_location'] = ' (';
 			if (! isset($r['after_location'])) $r['after_location'] = ')';
 			if (! isset($r['use_url'])) $r['use_url'] = true;
+			if (! isset($r['charset'])) $r['charset'] = get_bloginfo('charset');
 			if (! isset($r['echo'])) $r['echo'] = true;
 
-			ICalEvents::do_display_events($r['url'], $r['gmt_start'], $r['gmt_end'], $r['limit'], $r['date_format'], $r['time_format'], $r['before'], $r['after'], $r['before_date'], $r['after_date'], $r['use_summary'], $r['before_summary'], $r['after_summary'], $r['use_description'], $r['before_description'], $r['after_description'], $r['replace_newlines_with'], $r['use_location'], $r['before_location'], $r['after_location'], $r['use_url'], $r['echo']);
+			ICalEvents::do_display_events($r['url'], $r['gmt_start'], $r['gmt_end'], $r['limit'], $r['date_format'], $r['time_format'], $r['before'], $r['after'], $r['before_date'], $r['after_date'], $r['use_summary'], $r['before_summary'], $r['after_summary'], $r['use_description'], $r['before_description'], $r['after_description'], $r['replace_newlines_with'], $r['use_location'], $r['before_location'], $r['after_location'], $r['use_url'], $r['charset'], $r['echo']);
 		}
 
 		/*
 		 * Helper method for displaying events. Note that the API of
 		 * this method may change, so you should use display_events.
 		 */
-		function do_display_events($url, $gmt_start, $gmt_end, $limit, $date_format, $time_format, $before, $after, $before_date, $after_date, $use_summary, $before_summary, $after_summary, $use_description, $before_description, $after_description, $replace_newlines_with, $use_location, $before_location, $after_location, $use_url, $echo) {
+		function do_display_events($url, $gmt_start, $gmt_end, $limit, $date_format, $time_format, $before, $after, $before_date, $after_date, $use_summary, $before_summary, $after_summary, $use_description, $before_description, $after_description, $replace_newlines_with, $use_location, $before_location, $after_location, $use_url, $charset, $echo) {
 			$events = ICalEvents::get_events($url, $gmt_start, $gmt_end, $limit);
 			if (! $events) return;
 
@@ -77,10 +78,10 @@ if (! class_exists('ICalEvents')) {
 
 				$output .= $before_date;
 				if (ICalEvents::is_all_day($event['StartTime'], $event['EndTime'])) {
-					$output .= htmlentities(strftime($date_format, $event['StartTime']));
+					$output .= htmlentities(strftime($date_format, $event['StartTime']), ENT_COMPAT, $charset);
 				}
 				else {
-					$output .= htmlentities(ICalEvents::format_date_range($event['StartTime'], $event['EndTime'], $event['Untimed'], $date_format, $time_format));
+					$output .= htmlentities(ICalEvents::format_date_range($event['StartTime'], $event['EndTime'], $event['Untimed'], $date_format, $time_format), ENT_COMPAT, $charset);
 				}
 				$output .= $after_date;
 
@@ -89,7 +90,7 @@ if (! class_exists('ICalEvents')) {
 					if ($use_url and $event['URL']) {
 						$output .= '<a href="' . $event['URL'] . '">';
 					}
-					$output .= htmlentities($event['Summary']);
+					$output .= htmlentities($event['Summary'], ENT_COMPAT, $charset);
 					if ($use_url and $event['URL']) {
 						$output .= '</a>';
 					}
@@ -99,17 +100,17 @@ if (! class_exists('ICalEvents')) {
 				if ($use_description and $event['Description']) {
 					$output .= $before_description;
 					if ($replace_newlines_with) {
-						$output .= str_replace("\n", $replace_newlines_with, htmlentities($event['Description']));
+						$output .= str_replace("\n", $replace_newlines_with, htmlentities($event['Description'], ENT_COMPAT, $charset));
 					}
 					$output .= $after_description;
 				}
 
 				if ($use_location and $event['Location']) {
-					$output .= $before_location . htmlentities($event['Location']) . $after_location;
+					$output .= $before_location . htmlentities($event['Location'], ENT_COMPAT, $charset) . $after_location;
 				}
 
 				if ($event['UID']) {
-					$output .= '<!-- ' . htmlentities($event['UID']) . ' -->';
+					$output .= '<!-- ' . htmlentities($event['UID'], ENT_COMPAT, $charset) . ' -->';
 				}
 				$output .= $after . "\n";
 			}

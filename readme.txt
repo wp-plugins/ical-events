@@ -104,3 +104,11 @@ As of version 1.9, this plugin supports usage of cURL via WordPress' `wp_remote_
 If you are an administrator of your WordPress site, you can force the plugin to reload it. Just add `?ical_events_reload=1` to the end of the URL (or `&ical_events_reload=1` if the URL already contains a question mark).
 
 Note: Your user account must have the `activate_plugins` role for this to work.
+
+= The text comes out garbled or looks encoded incorrectly. How do I fix this? =
+
+As of version 1.13, you can explicitly set the calendar's character set for conversion to HTML:
+
+`ICalEvents::display_events('url=...&charset=EUC-JP');`
+
+The conversion defaults to your blog's character set, which is usually UTF-8. The supported character sets are listed in the [htmlentities](http://php.net/htmlentities) documentation.

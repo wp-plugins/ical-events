@@ -135,7 +135,7 @@ if (! class_exists('ICalEvents')) {
 			}
 
 			$events = parse_ical($file);
-			if (! is_array($events) or count($events) <= 0) {
+			if (! is_array($events)) {
 				echo "iCal Events: Error parsing calendar [$url]";
 				return;
 			}

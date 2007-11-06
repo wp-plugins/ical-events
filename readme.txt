@@ -2,7 +2,7 @@
 Contributors: dwc
 Tags: calendar, events
 Requires at least: 2.0
-Tested up to: 2.2
+Tested up to: 2.3
 Stable tag: 1.12
 
 Display upcoming events from a shared calendar.

@@ -42,7 +42,7 @@ if (! class_exists('ICalEvents')) {
 			if (! isset($r['gmt_end'])) $r['gmt_end'] = null;
 			if (! isset($r['limit'])) $r['limit'] = null;
 			if (! isset($r['date_format'])) $r['date_format'] = '%a %b %e';
-			if (! isset($r['time_format'])) $r['time_format'] = '%l:%M %p';
+			if (! isset($r['time_format'])) $r['time_format'] = '%I:%M %p';
 			if (! isset($r['before'])) $r['before'] = '<li>';
 			if (! isset($r['after'])) $r['after'] = '</li>';
 			if (! isset($r['before_date'])) $r['before_date'] = '<strong>';

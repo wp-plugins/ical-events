@@ -9,6 +9,8 @@ Display upcoming events from a shared calendar.
 
 == Description ==
 
+Note: The plugin should work with any version of WordPress but it is no longer being updated. You may wish to try [amr-ical-events-list](http://wordpress.org/extend/plugins/amr-ical-events-list/) instead.
+
 Fetch and display events from an iCalendar (`.ics`) URL in your blog.
 
 This plugin uses [import_ical.php](http://cvs.sourceforge.net/viewcvs.py/webcalendar/webcalendar/import_ical.php?rev=HEAD) from the [WebCalendar](http://sourceforge.net/projects/webcalendar/) project. A slightly modified version of their parser is provided with this plugin.

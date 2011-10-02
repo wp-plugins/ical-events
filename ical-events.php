@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: iCal Events
-Version: 1.13
+Version: 1.14
 Plugin URI: http://danieltwc.com/2005/ical-events-plugin/
 Description: Display events from an iCal source. Uses <a href="http://cvs.sourceforge.net/viewcvs.py/webcalendar/webcalendar/import_ical.php?rev=HEAD">import_ical.php</a> from the <a href="http://sourceforge.net/projects/webcalendar/">WebCalendar</a> project.
 Author: Daniel Westermann-Clark
